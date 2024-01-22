@@ -1,0 +1,822 @@
+
+functions:
+ -dml statements can not be executed in functions
+ -if we use dml statemenrts in functions, we can not use those functions in select statements
+ -if we want to use use dml and call that function in select statements , then we have to make the transction as autonomous transaction
+
+
+
+
+
+
+
+use of autonomous transaction :
+------------------------------
+
+use of pragma autonomous_transaction is changes the way subprogram works within transaction , subprogram marked with the pragma can do sql operations or commit/rollback operations, without committing and roll backing the data in the main transaction.
+
+create table emp as select * from hr.employees;
+
+DECLARE
+   l_salary   NUMBER;
+   PROCEDURE nested_block IS
+   PRAGMA autonomous_transaction;
+    BEGIN
+     UPDATE emp
+       SET salary = salary + 15000
+       WHERE employee_id = 102;
+   COMMIT;
+   END;
+BEGIN
+   SELECT salary INTO l_salary FROM emp WHERE employee_id = 101;
+   dbms_output.put_line('Before Salary of 101 is'|| l_salary);
+   SELECT salary INTO l_salary FROM emp WHERE employee_id = 102;
+   dbms_output.put_line('Before Salary of 102 is'|| l_salary);    
+   UPDATE emp 
+   SET salary = salary + 5000 
+   WHERE employee_id = 101;
+
+nested_block;
+ROLLBACK;
+
+ SELECT salary INTO  l_salary FROM emp WHERE employee_id = 101;
+ dbms_output.put_line('After Salary of 101 is'|| l_salary);
+ SELECT salary INTO l_salary FROM emp WHERE employee_id = 102;
+ dbms_output.put_line('After Salary of 102 is '|| l_salary);
+end;
+
+
+
+
+
+
+
+
+
+
+
+
+
+create table job as select * from hr.jobs where 1=2;
+desc job;
+
+create table log_error(log_id number, log_desc varchar2(255));
+
+declare
+  v_log_id number;
+  v_log_desc varchar2(255);
+begin
+     insert into job values('job1','SE',12000,34000);
+     insert into job values('job1','DE',11000,35000);
+     insert into job values('job1',1000$,14000,37000);
+     insert into job values('job1','TE',15000,38000);
+     commit;
+exception
+     when others then
+      v_log_id := sqlcode;
+       v_log_desc := sqlerrm;
+     error_desc_procedure(v_log_id,v_log_desc);
+     rollback;
+end;
+
+select * from job;
+select * from log_error;
+
+create or replace procedure error_desc_procedure(p_code number,p_errm varchar2)
+as
+PRAGMA Autonomous_transaction;
+begin
+   insert into log_error values(p_code,p_errm);
+   commit;
+end;
+
+
+Advantages of packages::
+----------------------
+1.logically grouping of subprograms  (logically group the related subprograms, objects and varaibles,constants)
+2.Security   (security of code through implementation of private subprograms)
+3.Better Performance  (entire package is loaded into memory when the package is first referenced , -there is only one copy of package in the memory of all users)
+4.feature that can be implemented within package
+    1.overloading of subprogram
+    2.global variables and constants
+    3.Initialization block
+    4.session state
+    5.Reuse object naming across other packages
+
+
+
+q).Consider we have table with duplicates entries in productions, we can not delete existing records, but now i want to prevent further duplicate data inserted into the table,how we can achieve this?
+
+create table temp_table(id number, name varchar2(255));
+
+insert into temp_table values(1,'kal');
+insert into temp_table values(2,'shik');
+insert into temp_table values(3,'king');
+insert into temp_table values(4,'lak');
+insert into temp_table values(1,'jink');
+
+select * from temp_table;
+
+alter table temp_table add constraint id_PK_CONS primary key(id);
+     error:
+         cannot validate (SQL_QFJDESSPANHJBHDFYHMSQPDTG.ID_PK_CONS) - primary key violated 
+
+alter table temp_table add constraint id_PK_CONS primary key(id) deferrable novalidate;
+
+insert into temp_table values(1,'karna');
+        -when we try to insert the duplicate data, we will get error
+         -RA-00001: unique constraint (SQL_QFJDESSPANHJBHDFYHMSQPDTG.ID_PK_CONS) violated ORA-06512: at "SYS.DBMS_SQL", line 1721
+
+    
+
+
+Difference between b-tree index and bitmap index::
+------------------------------------------------
+The basic differences between b-tree and bitmap indexes include:
+
+1:  Syntax differences:  The bitmap index includes the "bitmap" keyword.  The btree index does not say "bitmap".
+
+2: Cardinality differences:  The bitmap index is generally for columns with lots of duplicate values (low cardinality), while b-tree indexes are best for high cardinality columns.
+
+3: Internal structure differences:  The internal structures are quite different.  A b-tree index has index nodes (based on data block size), it a tree form:
+A bitmap index looks like this, a two-dimensional array with zero and one (bit) values:
+
+
+
+
+
+siva academy plsql sql ques and anwers:
+---------------------------------------
+
+1.difference between delete and truncate
+   DELETE:
+   -It is dml commond
+   -we can use where condition with delete statement
+   -we can delete specific rows using where condition
+   -slower because it uses undo segment, if we rollback results will coming back
+   -Triggers will get fired (on delete triggers)
+   -if we delete the complete table rows, the also the size of the table remains same
+   TRUNCATE
+   -It is DDL commond(ddl statements are auto committed)
+   -we can not use where condition with truncate statement
+   -All the rows will be removed, cant rollback
+   -Faster
+   -No triggers will get invoked.
+   -once we truncate the table, the size of the table will be reduced.
+
+2.What is the difference between Procedures and functions
+
+   Procedure:
+   -Procedure can have optionally return value using OUT AND INOUT parameter.
+   -Can not be called from the sql statements
+   -Used to implement logical data flow , to write the business logic.
+   -Procedure can have dml statements
+   -RETURN keyword to used return out of procedure.
+
+3.what is the difference between NVL,NVL2,NULLIF,COALESCE
+     NVL:
+     - syntax  :   NVL(argu1,argu2);
+     -it takes two arguments
+     -if values in the argu1 is null, then it returns with argu2 value
+      if value in the argu1 is not null, then it returns the argu1 only
+      if both argu are null, then it returns the null only
+      
+     select nvl('a','b') as result from dual;   a
+     select nvl(null,'b') as result from dual;   b
+     select nvl(null,null) as result from dual;  null
+
+    NVL2:
+     -  syntax  :   NVL2(parameter_1,parameter_2,parameter_3);
+              if parameter_1 values is null, it returns the parameter_3 values, if not null, it returns the paraemeter_2 value
+
+      select nvl2('a','b','c') as result from dual;   b
+      select nvl2(null,'b','c') as result from dual;  c
+      select nvl2('a',null,'c') as result from dual;  null
+      select nvl2(null,'b',null) as result from dual;  null
+
+
+   NULLIF:
+      -is is a comparision function
+      -It takes two arguments,then it compares, if they are equal, then it returns as null
+                                                if they are not equal, then it retuns 1st argument value
+                                                if null is compraed with value then end up with error(inconsistent datatype)
+     NOTE: 1st argument should not be null, second argu can be null
+
+        select nullif('a','a') as result from dual;   null
+        select nullif('a','b') as result from dual;   a
+        select nullif(null,'b') as result from dual;   error(inconsistent datatype)
+        select nullif('a',null) as result from dual;  a
+
+
+   COALESCE:
+     -This function has a multiple arguments
+     -if first argument is null, it returns second argu
+      if seco argu i null, it will return 3rd argu
+      so on...
+     -if all argu are null, then it return as null value
+      
+select coalesce('a','b','c','d','e','f','g','h') as result from dual;   a
+select coalesce(null,'b','c','d','e','f','g','h') as result from dual;  b
+
+select coalesce('a',null,'c','d','e','f','g','h') as result from dual;  a
+select coalesce(null,null,'c','d','e','f','g','h') as result from dual;
+select coalesce(null,null,null,'d','e','f',null,'h') as result from dual; d
+select coalesce(null,null,null,null) as result from dual;    null  
+
+
+
+4.Difference between rank and dense_rank:
+   rank : rank will skip the order of rank,(if two values are same, it gives the same record, but it will skip the rank for the next value)   
+   dense_rank : it will not skip the rank
+
+   ex:
+   select salary, rank() over (order by salary desc),dense_rank() over (order by salary desc) from hr.employees;
+
+5.Difference between ddl,dml,dcl,tcl,drl(data retrieval lang)
+  ddl - create,alter,truncate,drop
+  dml  - insert,update,delete,merge
+  tcl  -commit,rollback,savepoint
+
+SAVEPOINT:
+ Savepoint is a command in SQL that is used with the rollback command.
+It is a command in Transaction Control Language that is used to mark the transaction in a table.
+Consider you are making a very long table, and you want to roll back only to a certain position in a table then; this can be achieved using the savepoint.
+If you made a transaction in a table, you could mark the transaction as a certain name, and later on, if you want to roll back to that point, you can do it easily by using the transaction's name.
+Savepoint is helpful when we want to roll back only a small part of a table and not the whole table. In simple words, we can say savepoint is a bookmark in SQL.
+
+  dcl  -grant,revoke
+  drl _ select
+  
+
+6.How to get unique records without use of distict keyword:
+
+select * from hr.employees;
+select distinct first_name from hr.employees;
+select distinct first_name from hr.employees order by first_name;
+select first_name from hr.employees group by first_name order by first_name;
+
+select first_name from hr.employees
+union
+select null from dual where 1=2;
+
+
+select unique first_name from hr.employees order by first_name;
+
+select first_name from hr.employees
+intersect
+select first_name from hr.employees;
+
+select first_name from hr.employees
+minus
+select null from dual;
+
+note: MINUS operator will return only those rows which are unique in only first SELECT query and not those rows which are common to both first and second SELECT queries.
+
+
+using row_number
+    
+select first_name,last_name from (select first_name,last_name, row_number() over(partition by first_name,last_name order by first_name,last_name) as r from hr.employees) where r=1;
+
+using rank()
+
+select first_name,last_name from (select first_name,last_name, rank() over(partition by first_name,last_name order by rownum) as r from hr.employees) where r=1;
+
+
+
+
+7.What is the dual table:
+-dual table is the dummy table, used by all users , to gain performance
+-used to compute the expressions and calculations
+-it contains column name as dummy and type varchar2 and its value is X
+-we can also create our own dual table.
+
+elect rownum,dummy from dual;
+
+
+select 2+3 from dual;
+select sysdate from dual;
+
+select 45*45/8*8*9 from dual;
+
+SELECT concat('first_name',CONCAT(' ','last_name'))
+FROM dual;
+
+
+select user from dual;
+
+select substr('welcome',4,3) from dual;
+
+select rownum from dual connect by level <=10;
+create sequence emp_seq start with 1 increment by 2;
+select emp_seq.nextval from dual;
+
+select emp_seq.currval from dual;
+
+8.What is trigger in oracle?
+
+-trigger is a pl/sql block structure ,which is automatically fired when the event occurs in the database.
+-The event can be DDL OR DML OR system events.
+-A trigger code is automatically fired when an associated event happens in the database.
+-main use of trigger is event logging / data logging purpose.
+
+types:
+-----
+1.DML trigger
+2.DDL trigger
+3.system trigger(logon,logoff,startup,shutdown)
+4.instead of trigger(created on views)
+5.Compound trigger (combination of all dml triggers)
+
+purpose of triggers:
+-------------------
+1.Auditing
+2.Logging
+3.Enforcing security of transactions.
+4.Data replicating to multiple table
+5.Prevent invalid data or transactions.
+6.DDL triggers for auditing and logging for the dml statements
+7.ddl triggers to block unwanted ddl statements
+8.System triggers mainly for auditing and logging
+9.system triggers to do some initial clean up activity or to initiate jobs based on logon /logoff or startup or shutdown
+10.automatic triggers of other events(like send email on data change or job completion status)
+
+
+
+8.Difference between DML AND DDL?
+   DDL(Data definition language):
+   -DDL statements used to defining and managing database structure(like view,table,sequence,tablespace,users)
+   -DDL statements work on the whole object (truncate will remove all the rows in the table)
+   -DDL statements cant be used with where condition
+   -All ddl statements are autocommitted.(explicit mentioning is not needed for ddl statements)
+
+
+  DML(Data Manipultion Language):
+   -DML statements are used to manage the data stored int he database.   
+   -DML statements works on selected data in the table.
+   -Where condtion is used to filter the selected dataset
+   -All changes done by dml statements are explicitly commit or rollback, to changes to permanent or to revert back.
+   
+
+9.Difference between DECODE and CASE:
+------------------------------------
+DECODE:
+   -decode is function, it works similar to the case
+   -we cant use any operators other then equal operator
+   -decode can not be used as expression in plsql, we have to use decode with select statement only in plsql
+   
+
+
+CASE:
+  -case is extension of decode
+  -we can use greater lesser equal and logical operators in case 
+  -we can use case as expression in plsql
+
+
+
+
+create table student_tab(s_no number,s_name varchar2(255),s_marks number, s_result varchar2(255));
+
+insert into student_tab(s_no,s_name,s_marks,s_result) values(1,'gagan',89,'P');
+insert into student_tab(s_no,s_name,s_marks,s_result) values(2,'buvan',79,'P');
+insert into student_tab(s_no,s_name,s_marks,s_result) values(3,'shiv',25,'F');
+insert into student_tab(s_no,s_name,s_marks,s_result) values(4,'gagan',34,'F');
+insert into student_tab(s_no,s_name,s_marks,s_result) values(4,'dany',34,null);
+
+select * from student_tab;
+select s_result,decode(s_result,'F','FAIL','P','PASS','RESULT NOT AVILABLE') as output from student_tab;
+
+
+
+
+select s_result, CASE s_result 
+                 when 'F' then 'FAIL'
+                 when 'P' then 'PASS'
+                 else
+                 'result not available'
+                 end as otput from student_tab;
+
+select s_result, CASE  
+                 when s_result='F' then 'FAIL'
+                 when s_result='P' then 'PASS'
+                 else
+                 'result not available'
+                 end as output from student_tab;
+
+select s_name,s_marks,s_result, CASE  
+                 when s_result='P' and s_marks<85 then 'firstclass'
+                 when s_result='P' and s_marks>=85 then 'DISTINCTION'
+                 else
+                 'result not available'
+                 end as output from student_tab;
+
+
+select decode(:input,'1','one','2','two','3','three','RESULT NOT AVILABLE') as output from dual; 
+
+select decode(:input,'1','one',2,'two','3','three','RESULT NOT AVILABLE') as output from dual;  --works fine
+
+select CASE  :input
+                 when '1' then 'one'
+                 when '2' then 'two'
+                 when '3' then 'three'
+                 else
+                 'result not available'
+                 end as output from dual;
+
+select CASE  :input
+                 when '1' then 'one'
+                 when  2 then 'two'
+                 when '3' then 'three'
+                 else
+                 'result not available'
+                 end as output from dual;  -- gets data inconsistency error
+
+--difference of decode and case in plsql
+
+--we can use any single row functions as part of expression in pl/sql
+declare
+   lv_result varchar2(255);
+begin
+   lv_result := upper('welcome to zoomanji!!');
+   dbms_output.put_line(lv_result);
+end;
+
+--but we can not use decode function
+declare
+   lv_result varchar2(255);
+   lv_input varchar2(255):='P';
+begin
+   lv_result := decode(lv_input,'P','PASS','F','FAIL','NOT AVAILABLE');
+   dbms_output.put_line(lv_result);
+end;
+       ERROR: PLS-00204: function or pseudo-column 'DECODE' may be used inside a SQL statement only 
+
+declare
+   lv_result varchar2(255);
+   lv_input varchar2(255):='P';
+begin
+    select decode(lv_input,'P','PASS','F','FAIL','NOT AVAILABLE') into lv_result from dual;
+    dbms_output.put_line(lv_result);
+end;
+   --successfully worked
+
+
+declare
+   lv_result varchar2(255);
+   lv_input varchar2(255):='3';
+begin
+select CASE  lv_input
+                 when '1' then 'one'
+                 when '2' then 'two'
+                 when '3' then 'three'
+                 else
+                 'result not available'
+                 end  into lv_result  from dual;   dbms_output.put_line(lv_result);
+end;
+
+
+--we can use case as part of statement also and as exprssion also in plsql
+declare
+   lv_result varchar2(255);
+   lv_input varchar2(255):='3';
+begin
+            CASE  lv_input
+                 when '1' then lv_result:='one';
+                 when '2' then lv_result:='two';
+                 when '3' then lv_result:='three';
+                 else
+                  lv_result:='result not available';
+           END CASE;
+           dbms_output.put_line(lv_result);
+end;
+
+declare
+   lv_result varchar2(255);
+   lv_input varchar2(255):='4';
+begin
+            lv_result:= CASE  lv_input
+                 when '1' then 'one'
+                 when '2' then 'two'
+                 when '3' then 'three'
+                 else
+                    'result not available'
+            end;
+           dbms_output.put_line(lv_result);
+end;
+
+
+
+
+11.Difference between replace and translate
+
+--replace: replace function is the string replacement function
+select replace('the house of the dragons','dragons','NIGHTKING') from dual;  --the house of the NIGHTKING
+select replace('the house of the dragons','dragons',' ') from dual; --the house of the  
+
+--translate : this function is the character by character replacement
+select translate('the house of the abcde','abcde','12345') from dual;   --th5 hous5 of th5 12345
+select translate('the house of the abcde','abcde','1234') from dual     --th hous of th 1234  (if there is know corresponding char , then that value will be removed)
+
+select translate('the house of the abcde','abcde','')  from dual;  --null
+select translate('the house of the abcde','abcde',' ')  from dual;  --th hous of th  
+
+
+
+12. Views and types of views?
+
+ views:
+   views are logical table, it has result set of sql query result
+  -it does not holds any recods in the database
+  -it will get the data from source table
+  
+  types:
+   -simple views
+     -creating view on only one table
+     -dml can possible
+     -aggregates function can be used
+   -complex views
+     -creating the views on more then one table
+     -no dml operation
+     -aggregates functions can be used
+
+
+
+create table emp1 as select * from hr.employees;
+
+create table dept1 as select * from hr.departments;
+
+create or replace view emp1_v as select * from emp1;
+
+create or replace view emp1_v2 as select distinct first_name,last_name from emp1; --distinct keyword is used in the select statement while creating the view
+
+select count(*) from emp1_v ;
+
+
+create or replace view emp_dept_v as select emp1.first_name,emp1.last_name,dept1.department_name from emp1 join dept1 using(department_id);
+
+
+select * from emp_dept_v;
+select count(*) from emp_dept_v;
+
+create or replace view emp_sal_v as select department_id,max(salary) max_sal,min(salary) min_sal,avg(salary)avg_sal from emp1 group by department_id;
+
+select DISTINCT FIRST_NAME, LAST_NAME from emp1_v;  --distict keyword can be used in view
+
+select department_id,max(salary) from emp1_v group by department_id;   --aggregate function used in simple views
+
+select * from user_views;
+select view_name,text from user_views;
+
+select * from user_tab_columns where table_name='EMP1';
+
+select distinct table_name from user_tab_columns;
+
+select table_name from user_tab_columns
+minus
+select null from dual;
+
+select table_name from user_tab_columns
+union
+select table_name from user_tab_columns;
+
+DML ALLOWED IN VIEWS?
+
+     yes dml allowed in simple views, but complex views not supported with dml
+----------------------------
+select * from student_tab;
+
+create or replace view stud_tab_v as select * from student_tab;
+
+insert into stud_tab_v(s_no,s_name,s_marks,s_result) values(8,'jack',50,'P');
+insert into stud_tab_v(s_no,s_name,s_marks,s_result) values(9,'heni',70,'P');
+
+select * from stud_tab_v; --inserted into view
+select * from student_tab; --inserted into source table also
+
+--now i insert to source table
+insert into student_tab(s_no,s_name,s_marks,s_result) values(10,'yami',55,'P');
+select * from student_tab; --inserted into source table 
+
+select * from stud_tab_v; --inserted into view also
+
+
+ddl allowed in view?
+      --NO      
+alter table stud_tab_v rename column s_no to s_number;
+    --not allowed in views
+alter table student_tab rename column s_no to s_number;  --altered
+
+
+13.DML in function
+
+--use of dml in functions
+create table emp as select * from hr.employees;
+
+create or replace function fun_dml return varchar2
+as
+begin
+    update emp set salary=salary+100;
+    return 'dml succeeded';
+end;
+
+select fun_dml from dual;
+   --cannot perform a DML operation inside a query 
+
+--eventhough we can use dml inside function and call inside the query with function as autonomous transaction
+create or replace function fun_dml return varchar2
+as
+pragma autonomous_transaction;
+begin
+    update emp set salary=salary+100;
+    commit;
+    return 'dml succeeded';
+end;
+
+select fun_dml from dual; 
+
+
+
+-------------------
+
+ddl statements in functions
+============================
+create or replace function ddl_fun return varchar2
+as 
+begin
+   create table dummy(id number);
+   drop table dummy;
+end;
+  --compilation error
+
+
+--ddl statements will be executed in plsql using dynamic sql
+
+create or replace function ddl_fun return varchar2
+as 
+begin
+   execute immediate 'create table dummy(id number)';
+   execute immediate 'drop table dummy';
+   return 'ddl executed successfully';
+end;
+
+select ddl_fun from dual;
+    error: 
+ORA-14552: cannot perform a DDL, commit or rollback inside a query or DML 
+
+--use autonomous transaction
+create or replace function ddl_fun return varchar2
+as 
+  pragma autonomous_transaction;
+begin
+   execute immediate 'create table dummy(id number)';
+   execute immediate 'drop table dummy';
+    --commit; (bcs ddl statements are auto committed)
+   return 'ddl executed successfully';
+
+end;
+
+select ddl_fun from dual;
+   --ddl executed successfully
+
+
+create table emp as select * from hr.employees;
+create or replace function get_name return varchar2
+as
+begin
+     update emp set salary=salary+100;
+     return 'updated successfully';
+end;
+
+select get_name from dual;
+         error: ORA-14551: cannot perform a DML operation inside a query 
+             
+--we can able to call dml included function as expression in bigin end block
+declare
+lv_expression varchar2(255);
+begin
+     lv_expression := get_name;
+     dbms_output.put_line(lv_expression);
+end;
+--we can not use select statement in begin end block to call the function
+
+declare
+lv_expression varchar2(255);
+begin
+    -- lv_expression := get_name;
+    -- dbms_output.put_line(lv_expression);
+     select get_name into lv_expression from dual;
+end;
+  error : cannot perform a DML operation inside a query 
+
+15.Can we use out and inout parameter in function
+  -yes we can use out and inout parameter in function, but we have to call that function by begin end block,
+  - we can not call the function has inout and out parameter in select query, but we can use separate function caller without use of out parameter, then we can call that function in select query to get the result.
+
+
+create or replace function sq_number(p_number in number) return number
+as
+begin
+     return p_number*p_number;
+end;
+
+select sq_number(2) from dual;
+
+create or replace function cube_number(p_number in number,p_cube Out number) return number
+as
+begin
+     p_cube:=p_number*p_number*p_number;
+     return p_number*p_number;
+end;
+
+
+--when function has out parameter, the we can not call that function with select statement
+
+declare
+lv_cube number;
+begin
+    -- lv_expression := get_name;
+    -- dbms_output.put_line(lv_expression);
+      select cube_number(2,lv_cube) into lv_cube from dual;   
+end;
+
+ORA-06572: Function CUBE_NUMBER has out arguments ORA-06512: at line 6
+
+--we can call out parameter function by assigning expression instead of select statement
+declare
+lv_cube number;
+lv_sqare number;
+begin
+    lv_sqare := cube_number(2,lv_cube);
+    dbms_output.put_line(lv_sqare);  --return value of the function
+    dbms_output.put_line(lv_cube);  --result of out parameter
+
+end;
+        --executed successfully
+
+-----------------
+create or replace function cube_number(p_number in number,p_cube out number) return number
+as
+begin
+    p_cube:=p_number*p_number*p_number;
+    return p_number*p_number;
+end;
+
+
+create or replace function cube_number_caller(p_number in number) return number
+as
+v_cube_number number;
+v_square_number number;
+begin
+      v_square_number := cube_number(p_number,v_cube_number);
+      dbms_output.put_line(v_cube_number);  
+      return v_square_number;
+end;
+
+select cube_number_caller(7) from dual;
+
+or
+
+with 
+    function cube_number(p_number in number,p_cube out number) return number
+    as
+    begin
+    p_cube:=p_number*p_number*p_number;
+    return p_number*p_number;
+    end;
+
+    function cube_number_caller(p_number in number) return number
+    as
+    v_cube_number number;
+    v_square_number number;
+    begin
+      v_square_number := cube_number(p_number,v_cube_number);
+      dbms_output.put_line(v_cube_number);  
+      return v_square_number;
+    end;
+select cube_number_caller(8) from dual;
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+

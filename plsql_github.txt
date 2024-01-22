@@ -1,0 +1,1291 @@
+triggers:
+https://github.com/porpup/PL-SQL_TRIGGER
+https://github.com/FaroukBENGHARSSALLAH/plsql-trigger
+https://github.com/naveen8853/Ex-No-5-Creating-Triggers-using-PL-SQL
+
+cursors:
+https://github.com/JieunKwon/PL_SQL_Cursor
+
+https://github.com/porpup/PL-SQL_CURSOR_FOR_LOOP
+
+https://github.com/porpup/PL-SQL_CURSOR_with_parameters
+
+https://github.com/porpup/PL-SQL_CURSOR_LOOPs
+
+
+
+https://github.com/srikanthpragada/plsql
+
+https://github.com/JieunKwon/PL_SQL_Procedure_Function
+
+https://github.com/graf-script/plsql-procedure/blob/main/plsql
+
+https://github.com/porpup/PL-SQL_PROCEDURE_Overloading/blob/master/projectPart9.sql
+
+https://github.com/porpup/SQL_Final_Exam
+
+https://github.com/porpup/PL-SQL_Final_Exam
+
+https://github.com/porpup/PL-SQL_VIEW
+
+https://github.com/porpup/PL-SQL_PACKAGE
+
+
+
+https://github.com/porpup/PL-SQL_Parameter_Mode
+
+https://github.com/porpup/PL-SQL_SELECT_INTO
+
+https://github.com/porpup/PL-SQL_IF_condition
+
+
+plsql project:
+https://github.com/victorst79/PL-SQL-project
+
+https://github.com/mirandamo94/PL-SQL-Projects
+
+https://github.com/rcfountain01/PL-SQL-Projects/tree/master
+
+https://github.com/eleonora98/PLSQL/tree/master
+
+
+
+
+
+===================================
+completed:
+
+https://github.com/porpup/PL-SQL_SELECT_INTO
+
+https://github.com/porpup/PL-SQL_IF_condition
+
+-------
+CREATE TABLE DEPT(
+  DEPTNO NUMBER(2, 0),
+  DNAME VARCHAR2(14),
+  LOC VARCHAR2(13),
+  CONSTRAINT PK_DEPT PRIMARY KEY (DEPTNO)
+);
+
+CREATE TABLE EMP(
+  EMPNO NUMBER(4, 0),
+  ENAME VARCHAR2(10),
+  JOB VARCHAR2(9),
+  MGR NUMBER(4, 0),
+  HIREDATE DATE,
+  SAL NUMBER(7, 2),
+  COMM NUMBER(7, 2),
+  DEPTNO NUMBER(2, 0),
+  CONSTRAINT PK_EMP PRIMARY KEY (EMPNO),
+  CONSTRAINT FK_DEPTNO FOREIGN KEY (DEPTNO) REFERENCES DEPT (DEPTNO)
+);
+
+CREATE TABLE BONUS(
+  ENAME VARCHAR2(10),
+  JOB VARCHAR2(9),
+  SAL NUMBER,
+  COMM NUMBER
+);
+
+CREATE TABLE SALGRADE(
+  GRADE NUMBER,
+  LOSAL NUMBER,
+  HISAL NUMBER
+);
+
+INSERT INTO DEPT VALUES(
+  10,
+  'ACCOUNTING',
+  'NEW YORK'
+);
+
+INSERT INTO DEPT VALUES(
+  20,
+  'RESEARCH',
+  'DALLAS'
+);
+
+INSERT INTO DEPT VALUES(
+  30,
+  'SALES',
+  'CHICAGO'
+);
+
+INSERT INTO DEPT VALUES(
+  40,
+  'OPERATIONS',
+  'BOSTON'
+);
+
+INSERT INTO EMP VALUES(
+  7839,
+  'KING',
+  'PRESIDENT',
+  NULL,
+  TO_DATE('17-11-1981', 'dd-mm-yyyy'),
+  5000,
+  NULL,
+  10
+);
+
+INSERT INTO EMP VALUES(
+  7698,
+  'BLAKE',
+  'MANAGER',
+  7839,
+  TO_DATE('1-5-1981', 'dd-mm-yyyy'),
+  2850,
+  NULL,
+  30
+);
+
+INSERT INTO EMP VALUES(
+  7782,
+  'CLARK',
+  'MANAGER',
+  7839,
+  TO_DATE('9-6-1981', 'dd-mm-yyyy'),
+  2450,
+  NULL,
+  10
+);
+
+INSERT INTO EMP VALUES(
+  7566,
+  'JONES',
+  'MANAGER',
+  7839,
+  TO_DATE('2-4-1981', 'dd-mm-yyyy'),
+  2975,
+  NULL,
+  20
+);
+
+INSERT INTO EMP VALUES(
+  7788,
+  'SCOTT',
+  'ANALYST',
+  7566,
+  TO_DATE('13-JUL-87', 'dd-mm-rr') - 85,
+  3000,
+  NULL,
+  20
+);
+
+INSERT INTO EMP VALUES(
+  7902,
+  'FORD',
+  'ANALYST',
+  7566,
+  TO_DATE('3-12-1981', 'dd-mm-yyyy'),
+  3000,
+  NULL,
+  20
+);
+
+INSERT INTO EMP VALUES(
+  7369,
+  'SMITH',
+  'CLERK',
+  7902,
+  TO_DATE('17-12-1980', 'dd-mm-yyyy'),
+  800,
+  NULL,
+  20
+);
+
+INSERT INTO EMP VALUES(
+  7499,
+  'ALLEN',
+  'SALESMAN',
+  7698,
+  TO_DATE('20-2-1981', 'dd-mm-yyyy'),
+  1600,
+  300,
+  30
+);
+
+INSERT INTO EMP VALUES(
+  7521,
+  'WARD',
+  'SALESMAN',
+  7698,
+  TO_DATE('22-2-1981', 'dd-mm-yyyy'),
+  1250,
+  500,
+  30
+);
+
+INSERT INTO EMP VALUES(
+  7654,
+  'MARTIN',
+  'SALESMAN',
+  7698,
+  TO_DATE('28-9-1981', 'dd-mm-yyyy'),
+  1250,
+  1400,
+  30
+);
+
+INSERT INTO EMP VALUES(
+  7844,
+  'TURNER',
+  'SALESMAN',
+  7698,
+  TO_DATE('8-9-1981', 'dd-mm-yyyy'),
+  1500,
+  0,
+  30
+);
+
+INSERT INTO EMP VALUES(
+  7876,
+  'ADAMS',
+  'CLERK',
+  7788,
+  TO_DATE('13-JUL-87', 'dd-mm-rr') - 51,
+  1100,
+  NULL,
+  20
+);
+
+INSERT INTO EMP VALUES(
+  7900,
+  'JAMES',
+  'CLERK',
+  7698,
+  TO_DATE('3-12-1981', 'dd-mm-yyyy'),
+  950,
+  NULL,
+  30
+);
+
+INSERT INTO EMP VALUES(
+  7934,
+  'MILLER',
+  'CLERK',
+  7782,
+  TO_DATE('23-1-1982', 'dd-mm-yyyy'),
+  1300,
+  NULL,
+  10
+);
+
+INSERT INTO SALGRADE VALUES (
+  1,
+  700,
+  1200
+);
+
+INSERT INTO SALGRADE VALUES (
+  2,
+  1201,
+  1400
+);
+
+INSERT INTO SALGRADE VALUES (
+  3,
+  1401,
+  2000
+);
+
+INSERT INTO SALGRADE VALUES (
+  4,
+  2001,
+  3000
+);
+
+INSERT INTO SALGRADE VALUES (
+  5,
+  3001,
+  9999
+);
+
+COMMIT;
+
+
+select * from salgrade;
+
+select * from bonus;
+select * from emp;
+select * from dept;
+
+/*Create a procedure that accepts an employee number to display the name of the department where he works, his name, his annual salary (do not forget his one time commission)
+Note that the salary in table employee is monthly salary.
+Handle the error (use EXCEPTION)
+HINT: the name of the department can be found from table dept.  */
+
+create or replace procedure get_emp_name(p_empno number)
+as
+d_name varchar2(100);
+e_salary number;
+e_name varchar2(100);
+e_comm number;
+begin
+     select dname,sal,ename,comm into d_name,e_salary,e_name,e_comm from emp join dept using(deptno) where empno=p_empno;
+      if e_comm is null then
+         e_salary:=e_salary*12;
+      else
+          e_salary:=e_salary*12+e_comm;
+      end if;
+     dbms_output.put_line('employee_name: '||e_name||' department_name: '||d_name||' annual salry + comm: '||e_salary);
+end;
+
+select * from emp;
+exec get_emp_name(7499);
+exec get_emp_name(7839);
+exec get_emp_name(100);
+-- error: ORA-01403: no data found ORA-06512:
+
+handled by exception
+
+create or replace procedure get_emp_name(p_empno number)
+as
+d_name varchar2(100);
+e_salary number;
+e_name varchar2(100);
+e_comm number;
+begin
+     select dname,sal,ename,comm into d_name,e_salary,e_name,e_comm from emp join dept using(deptno) where empno=p_empno;
+      if e_comm is null then
+         e_salary:=e_salary*12;
+      else
+          e_salary:=e_salary*12+e_comm;
+      end if;
+     dbms_output.put_line('employee_name: '||e_name||' department_name: '||d_name||' annual salry + comm: '||e_salary);
+exception
+    when no_data_found then
+       dbms_output.put_line('no employee found with this employee_id');
+end;
+
+execute get_emp_name(200);
+
+    output: no employee found with this employee_id
+
+------------------
+2)
+select * from customer;
+select * from orders;
+select * from item;
+select * from order_source;
+select * from color;
+select * from category;
+select * from inventory;
+select * from shipment_line;
+select * from order_line;
+
+CREATE TABLE item
+(item_id NUMBER(8),
+item_desc VARCHAR2(30),
+cat_id NUMBER(2),
+item_image BLOB,
+CONSTRAINT item_item_id_pk PRIMARY KEY (item_id),
+CONSTRAINT item_cat_id_fk FOREIGN KEY (cat_id) REFERENCES category(cat_id));
+
+CREATE TABLE color
+(color VARCHAR2(20),
+CONSTRAINT color_color_pk PRIMARY KEY (color));
+
+CREATE TABLE inventory
+(inv_id NUMBER(10),
+item_id NUMBER(8),
+color VARCHAR2(20),
+inv_size VARCHAR2(10),
+inv_price NUMBER(6,2),
+inv_qoh NUMBER(4),
+CONSTRAINT inventory_inv_id_pk PRIMARY KEY (inv_id),
+CONSTRAINT inventory_item_id_fk FOREIGN KEY (item_id) REFERENCES item(item_id),
+CONSTRAINT inventory_color_fk FOREIGN KEY (color) REFERENCES color(color));
+Create a procedure that accepts an inv_id to display the item description, price, color, inv_qoh, and the value of that inventory.
+Handle the error ( use EXCEPTION)
+Hint: value is the product of price and quantity on hand.
+     
+
+--- inserting records into ITEM
+INSERT INTO item VALUES
+(1, 'Men''s Expedition Parka', 3, EMPTY_BLOB());
+
+INSERT INTO item VALUES
+(2, '3-Season Tent', 4, EMPTY_BLOB());
+
+INSERT INTO item VALUES
+(3, 'Women''s Hiking Shorts', 1, EMPTY_BLOB());
+
+INSERT INTO item VALUES
+(4, 'Women''s Fleece Pullover', 1, EMPTY_BLOB());
+
+INSERT INTO item VALUES
+(5, 'Children''s Beachcomber Sandals', 2, EMPTY_BLOB());
+
+INSERT INTO item VALUES
+(6, 'Boy''s Surf Shorts', 2, EMPTY_BLOB());
+
+INSERT INTO item VALUES
+(7, 'Girl''s Soccer Tee', 2, EMPTY_BLOB());
+
+
+
+--- inserting records into INVENTORY
+INSERT INTO inventory VALUES
+(1, 2, 'Sky Blue', NULL, 259.99, 16);
+
+INSERT INTO inventory VALUES
+(2, 2, 'Light Grey', NULL, 259.99, 12);
+
+INSERT INTO inventory VALUES
+(3, 3, 'Khaki', 'S', 29.95, 150);
+
+INSERT INTO inventory VALUES
+(4, 3, 'Khaki', 'M', 29.95, 147);
+
+INSERT INTO inventory VALUES
+(5, 3, 'Khaki', 'L', 29.95, 0);
+
+INSERT INTO inventory VALUES
+(6, 3, 'Navy', 'S', 29.95, 139);
+
+INSERT INTO inventory VALUES
+(7, 3, 'Navy', 'M', 29.95, 137);
+
+INSERT INTO inventory VALUES
+(8, 3, 'Navy', 'L', 29.95, 115);
+
+INSERT INTO inventory VALUES
+(9, 4, 'Eggplant', 'S', 59.95, 135);
+
+INSERT INTO inventory VALUES
+(10, 4, 'Eggplant', 'M', 59.95, 168);
+
+INSERT INTO inventory VALUES
+(11, 4, 'Eggplant', 'L', 59.95, 187);
+
+INSERT INTO inventory VALUES
+(12, 4, 'Royal', 'S', 59.95, 0);
+
+INSERT INTO inventory VALUES
+(13, 4, 'Royal', 'M', 59.95, 124);
+
+INSERT INTO inventory VALUES
+(14, 4, 'Royal', 'L', 59.95, 112);
+
+INSERT INTO inventory VALUES
+(15, 5, 'Turquoise', '10', 15.99, 121);
+
+INSERT INTO inventory VALUES
+(16, 5, 'Turquoise', '11', 15.99, 111);
+
+INSERT INTO inventory VALUES
+(17, 5, 'Turquoise', '12', 15.99, 113);
+
+INSERT INTO inventory VALUES
+(18, 5, 'Turquoise', '1', 15.99, 121);
+
+INSERT INTO inventory VALUES
+(19, 5, 'Bright Pink', '10', 15.99, 148);
+
+INSERT INTO inventory VALUES
+(20, 5, 'Bright Pink', '11', 15.99, 137);
+
+INSERT INTO inventory VALUES
+(21, 5, 'Bright Pink', '12', 15.99, 134);
+
+INSERT INTO inventory VALUES
+(22, 5, 'Bright Pink', '1', 15.99, 123);
+
+INSERT INTO inventory VALUES
+(23, 1, 'Spruce', 'S', 199.95, 114);
+
+INSERT INTO inventory VALUES
+(24, 1,  'Spruce', 'M',199.95, 17);
+
+INSERT INTO inventory VALUES
+(25, 1, 'Spruce', 'L', 209.95, 0);
+
+INSERT INTO inventory VALUES
+(26, 1, 'Spruce', 'XL', 209.95, 12);
+
+INSERT INTO inventory VALUES
+(27, 6, 'Blue', 'S', 15.95, 50);
+
+INSERT INTO inventory VALUES
+(28, 6, 'Blue', 'M', 15.95, 100);
+
+INSERT INTO inventory VALUES
+(29, 6, 'Blue', 'L', 15.95, 100);
+
+INSERT INTO inventory VALUES
+(30, 7, 'White', 'S', 19.99, 100);
+
+INSERT INTO inventory VALUES
+(31, 7, 'White', 'M', 19.99, 100);
+
+INSERT INTO inventory VALUES
+(32, 7, 'White', 'L', 19.99, 100);
+
+
+create or replace procedure cust_details(p_inv_id number)
+as
+v_item_desc item.item_desc%type;
+v_colour inventory.color%type;
+v_price inventory.inv_price%type;
+v_quality_on_hand inventory.inv_qoh%type;
+v_value number;
+begin
+   select item_desc,color,inv_price,inv_qoh 
+    into v_item_desc,v_colour,v_price,v_quality_on_hand
+    from item join inventory on inventory.item_id=item.item_id where inv_id=p_inv_id ;
+     v_value:=v_price*v_quality_on_hand;
+    dbms_output.put_line(v_item_desc ||' total item price:'||v_value);
+exception
+     when no_data_found then
+      dbms_output.put_line('mentioned inv id is invalid,please provide correct email id!!');
+end;
+
+exec cust_details(100);
+
+
+CREATE TABLE LOCATION
+(loc_id NUMBER(6),
+bldg_code VARCHAR2(10),
+room VARCHAR2(6),
+capacity NUMBER(5), 
+CONSTRAINT location_loc_id_pk PRIMARY KEY (loc_id));
+
+CREATE TABLE faculty
+(f_id NUMBER(6),
+f_last VARCHAR2(30),
+f_first VARCHAR2(30),
+f_mi CHAR(1),
+loc_id NUMBER(5),
+f_phone VARCHAR2(10),
+f_rank VARCHAR2(8),
+f_pin NUMBER(4),
+f_image BLOB, 
+CONSTRAINT faculty_f_id_pk PRIMARY KEY(f_id),
+CONSTRAINT faculty_loc_id_fk FOREIGN KEY (loc_id) REFERENCES location(loc_id));
+
+CREATE TABLE student
+(s_id NUMBER(6),
+s_last VARCHAR2(30),
+s_first VARCHAR2(30),
+s_mi CHAR(1),
+s_address VARCHAR2(25),
+s_city VARCHAR2(20),
+s_state CHAR(2),
+s_zip VARCHAR2(10),
+s_phone VARCHAR2(10),
+s_class CHAR(2),
+s_dob DATE,
+s_pin NUMBER(4),
+f_id NUMBER(6),
+time_enrolled VARCHAR2(30),
+CONSTRAINT student_s_id_pk PRIMARY KEY (s_id),
+CONSTRAINT student_f_id_fk FOREIGN KEY (f_id) REFERENCES faculty(f_id));
+
+CREATE TABLE TERM
+(term_id NUMBER(6),
+term_desc VARCHAR2(20),
+status VARCHAR2(20),
+CONSTRAINT term_term_id_pk PRIMARY KEY (term_id),
+CONSTRAINT term_status_cc CHECK ((status = 'OPEN') OR (status = 'CLOSED')));
+
+CREATE TABLE COURSE
+(course_id NUMBER(6),
+call_id VARCHAR2(10),
+course_name VARCHAR2(25),
+credits NUMBER(2),
+CONSTRAINT course_course_id_pk PRIMARY KEY(course_id));
+
+CREATE TABLE COURSE_SECTION
+(c_sec_id NUMBER(6),
+course_id NUMBER(6) CONSTRAINT course_section_courseid_nn NOT NULL,
+term_id NUMBER(6) CONSTRAINT course_section_termid_nn NOT NULL,
+sec_num NUMBER(2) CONSTRAINT course_section_secnum_nn NOT NULL,
+f_id NUMBER(5),
+c_sec_day VARCHAR2(10),
+c_sec_time DATE,
+c_sec_duration VARCHAR2(30),
+loc_id NUMBER(6),
+max_enrl NUMBER(4) CONSTRAINT course_section_maxenrl_nn NOT NULL,
+CONSTRAINT course_section_csec_id_pk PRIMARY KEY (c_sec_id),
+CONSTRAINT course_section_cid_fk FOREIGN KEY (course_id) REFERENCES course(course_id), 	
+CONSTRAINT course_section_loc_id_fk FOREIGN KEY (loc_id) REFERENCES location(loc_id),
+CONSTRAINT course_section_termid_fk FOREIGN KEY (term_id) REFERENCES term(term_id),
+CONSTRAINT course_section_fid_fk FOREIGN KEY (f_id) REFERENCES faculty(f_id));
+
+CREATE TABLE ENROLLMENT
+(s_id NUMBER(6),
+c_sec_id NUMBER(6),
+grade CHAR(1),
+CONSTRAINT enrollment_pk PRIMARY KEY (s_id, c_sec_id),
+CONSTRAINT enrollment_sid_fk FOREIGN KEY (s_id) REFERENCES student(s_id),
+CONSTRAINT enrollment_csecid_fk FOREIGN KEY (c_sec_id) REFERENCES course_section (c_sec_id));
+
+
+
+---- inserting into LOCATION table
+INSERT INTO location VALUES
+(1, 'CR', '101', 150);
+
+INSERT INTO location VALUES
+(2, 'CR', '202', 40);
+
+INSERT INTO location VALUES
+(3, 'CR', '103', 35);
+
+INSERT INTO location VALUES
+(4, 'CR', '105', 35);
+
+INSERT INTO location VALUES
+(5, 'BUS', '105', 42);
+
+INSERT INTO location VALUES
+(6, 'BUS', '404', 35);
+
+INSERT INTO location VALUES
+(7, 'BUS', '421', 35);
+
+INSERT INTO location VALUES
+(8, 'BUS', '211', 55);
+
+INSERT INTO location VALUES
+(9, 'BUS', '424', 1);
+
+INSERT INTO location VALUES
+(10, 'BUS', '402', 1);
+
+INSERT INTO location VALUES
+(11, 'BUS', '433', 1);
+
+INSERT INTO location VALUES
+(12, 'LIB', '217', 2);
+
+INSERT INTO location VALUES
+(13, 'LIB', '222', 1);
+
+
+--- inserting records into FACULTY
+INSERT INTO faculty VALUES
+(1, 'Cox', 'Kim', 'J', 9, '7155551234', 'ASSO', 1181, EMPTY_BLOB());
+
+INSERT INTO faculty VALUES
+(2, 'Blanchard', 'John', 'R', 10, '7155559087', 'FULL', 1075, EMPTY_BLOB());
+
+INSERT INTO faculty VALUES
+(3, 'Williams', 'Jerry', 'F', 12, '7155555412', 'ASST', 8531, EMPTY_BLOB());
+
+INSERT INTO faculty VALUES
+(4, 'Sheng', 'Laura', 'M', 11, '7155556409', 'INST', 1690, EMPTY_BLOB());
+
+INSERT INTO faculty VALUES
+(5, 'Brown', 'Philip', 'E', 13, '7155556082', 'ASSO', 9899, EMPTY_BLOB());
+
+--- inserting records into STUDENT
+INSERT INTO student VALUES
+(1, 'Miller', 'Sarah', 'M', '144 Windridge Blvd.', 'Eau Claire', 
+'WI', '54703', '7155559876', 'SR', TO_DATE('07/14/1985', 'MM/DD/YYYY'), 8891, 1, '3-2');
+
+INSERT INTO student VALUES
+(2, 'Umato', 'Brian', 'D', '454 St. John''s Place', 'Eau Claire', 
+'WI', '54702', '7155552345', 'SR', TO_DATE('08/19/1985', 'MM/DD/YYYY'), 1230, 1, '4-2');
+
+INSERT INTO student VALUES
+(3, 'Black', 'Daniel', NULL, '8921 Circle Drive', 'Bloomer', 
+'WI', '54715', '7155553907', 'JR', TO_DATE('10/10/1982', 'MM/DD/YYYY'), 1613, 1, '3-0');
+
+INSERT INTO student VALUES
+(4, 'Mobley', 'Amanda', 'J', '1716 Summit St.', 'Eau Claire', 
+'WI', '54703', '7155556902', 'SO', TO_DATE('09/24/1986', 'MM/DD/YYYY'), 1841, 2, '2-2');
+
+INSERT INTO student VALUES
+(5, 'Sanchez', 'Ruben', 'R', '1780 Samantha Court', 'Eau Claire', 
+'WI', '54701', '7155558899', 'SO', TO_DATE('11/20/1986', 'MM/DD/YYYY'), 4420, 4, '1-11');
+
+INSERT INTO student VALUES
+(6, 'Connoly', 'Michael', 'S', '1818 Silver Street', 'Elk Mound', 
+'WI', '54712', '7155554944', 'FR', TO_DATE('12/4/1986', 'MM/DD/YYYY'), 9188, 3, '0-4');
+
+--- inserting records into TERM
+INSERT INTO term VALUES
+(1, 'Fall 2005', 'CLOSED');
+
+INSERT INTO term VALUES
+(2, 'Spring 2006', 'CLOSED');
+
+INSERT INTO term VALUES
+(3, 'Summer 2006', 'CLOSED');
+
+INSERT INTO term VALUES
+(4, 'Fall 2006', 'CLOSED');
+
+INSERT INTO term VALUES
+(5, 'Spring 2007', 'CLOSED');
+
+INSERT INTO term VALUES
+(6, 'Summer 2007', 'OPEN');
+
+--- inserting records into COURSE
+INSERT INTO course VALUES
+(1, 'MIS 101', 'Intro. to Info. Systems', 3);
+
+INSERT INTO course VALUES
+(2, 'MIS 301', 'Systems Analysis', 3);
+
+INSERT INTO course VALUES
+(3, 'MIS 441', 'Database Management', 3);
+
+INSERT INTO course VALUES
+(4, 'CS 155', 'Programming in C++', 3);
+
+INSERT INTO course VALUES
+(5, 'MIS 451', 'Web-Based Systems', 3);
+
+--- inserting records into COURSE_SECTION
+INSERT INTO course_section VALUES
+(1, 1, 4, 1, 2, 'MWF', TO_DATE('10:00 AM', 'HH:MI AM'), '0 00:00:50.00', 1, 140);
+
+INSERT INTO course_section VALUES
+(2, 1, 4, 2, 3, 'TR', TO_DATE('09:30 AM', 'HH:MI AM'), '0 00:01:15.00', 7, 35);
+
+INSERT INTO course_section VALUES
+(3, 1, 4, 3, 3, 'MWF', TO_DATE('08:00 AM', 'HH:MI AM'), '0 00:00:50.00', 2, 35);
+
+INSERT INTO course_section VALUES
+(4, 2, 4, 1, 4, 'TR', TO_DATE('11:00 AM', 'HH:MI AM'), '0 00:01:15.00', 6, 35);
+
+INSERT INTO course_section VALUES
+(5, 2, 5, 2, 4, 'TR', TO_DATE('02:00 PM', 'HH:MI PM'), '0 00:01:15.00', 6, 35);
+
+INSERT INTO course_section VALUES
+(6, 3, 5, 1, 1, 'MWF', TO_DATE('09:00 AM', 'HH:MI AM'), '0 00:00:50.00', 5, 30);
+
+INSERT INTO course_section VALUES
+(7, 3, 5, 2, 1, 'MWF', TO_DATE('10:00 AM', 'HH:MI AM'), '0 00:00:50.00', 5, 30);
+
+INSERT INTO course_section VALUES
+(8, 4, 5, 1, 5, 'TR', TO_DATE('08:00 AM', 'HH:MI AM'), '0 00:01:15.00', 3, 35);
+
+INSERT INTO course_section VALUES
+(9, 5, 5, 1, 2, 'MWF', TO_DATE('02:00 PM', 'HH:MI PM'), '0 00:00:50.00', 5, 35);
+
+INSERT INTO course_section VALUES
+(10, 5, 5, 2, 2, 'MWF', TO_DATE('03:00 PM', 'HH:MI PM'), '0 00:00:50.00', 5, 35);
+
+INSERT INTO course_section VALUES
+(11, 1, 6, 1, 1, 'MTWRF', TO_DATE('08:00 AM', 'HH:MI AM'), '0 00:01:30.00', 1, 50);
+
+INSERT INTO course_section VALUES
+(12, 2, 6, 1, 2, 'MTWRF', TO_DATE('08:00 AM', 'HH:MI AM'), '0 00:01:30.00', 6, 35);
+
+INSERT INTO course_section VALUES
+(13, 3, 6, 1, 3, 'MTWRF', TO_DATE('09:00 AM', 'HH:MI AM'), '0 00:01:30.00', 5, 35);
+
+--- inserting records into ENROLLMENT
+INSERT INTO enrollment VALUES
+(1, 1, 'A');
+
+INSERT INTO enrollment VALUES
+(1, 4, 'A');
+
+INSERT INTO enrollment VALUES
+(1, 6, 'B');
+
+INSERT INTO enrollment VALUES
+(1, 9, 'B');
+
+INSERT INTO enrollment VALUES
+(2, 1, 'C');
+
+INSERT INTO enrollment VALUES
+(2, 5, 'B');
+
+INSERT INTO enrollment VALUES
+(2, 6, 'A');
+
+INSERT INTO enrollment VALUES
+(2, 9, 'B');
+
+INSERT INTO enrollment VALUES
+(3, 1, 'C');
+
+INSERT INTO enrollment VALUES
+(3, 12, NULL);
+
+INSERT INTO enrollment VALUES
+(3, 13, NULL);
+
+INSERT INTO enrollment VALUES
+(4, 11, NULL);
+
+INSERT INTO enrollment VALUES
+(4, 12, NULL);
+
+INSERT INTO enrollment VALUES
+(5, 1, 'B');
+
+INSERT INTO enrollment VALUES
+(5, 5, 'C');
+
+INSERT INTO enrollment VALUES
+(5, 9, 'C');
+
+INSERT INTO enrollment VALUES
+(5, 11, NULL);
+
+INSERT INTO enrollment VALUES
+(5, 13, NULL);
+
+INSERT INTO enrollment VALUES
+(6, 11, NULL);
+
+INSERT INTO enrollment VALUES
+(6, 12, NULL);
+
+Create a function called find_age that accepts a date and return a number.
+The function will use the sysdate and the date inserted to calculate the age of the person with the birthdate inserted.
+Create a procedure that accepts a student number to display his name, his birthdate, and his age using the function find_age created above. Handle the error ( use EXCEPTION)
+
+
+select * from location;
+select * from faculty;
+
+select * from student;
+select * from term;
+select * from course;
+select * from course_section;
+select * from enrollment;
+
+/*Create a function called find_age that accepts a date and return a number.
+The function will use the sysdate and the date inserted to calculate the age of the person with the birthdate inserted.
+Create a procedure that accepts a student number to display his name, his birthdate, and his age using the function find_age created above. Handle the error ( use EXCEPTION)*/
+
+create or replace function find_age(p_date date) return number
+as
+    v_age number;
+begin
+    select (extract(year from sysdate)-extract(year from s_dob)) into v_age from student where s_dob=p_date;
+    return v_age;
+end;
+
+begin
+    dbms_output.put_line(find_age('14-JUL-85'));
+end;
+
+create or replace procedure stud_info(p_s_id number) 
+as
+    v_name varchar2(255);
+    v_date date;
+    v_age number;
+begin
+     select s_first||' '||s_last,s_dob,find_age(s_dob) into v_name,v_date,v_age from student where s_id=p_s_id;
+     dbms_output.put_line(v_name);
+     dbms_output.put_line(v_date);
+     dbms_output.put_line(v_age);
+end;
+
+exec stud_info(6);
+
+
+---------
+CREATE OR REPLACE FUNCTION find_age(input_bday DATE)
+RETURN NUMBER AS
+    bday DATE;
+    age NUMBER;
+BEGIN
+    bday := input_bday;
+    age := to_number(to_char(sysdate, 'YYYY')) - to_number(to_char(bday, 'YYYY'));
+    RETURN age;
+END;
+/
+
+CREATE OR REPLACE PROCEDURE student_info(student_ID NUMBER) AS
+    s_first_name STUDENT.S_FIRST%TYPE;
+    s_last_name STUDENT.S_LAST%TYPE;
+    s_bday STUDENT.S_DOB%TYPE;
+    s_age NUMBER;
+BEGIN
+    SELECT
+        S_FIRST,
+        S_LAST,
+        S_DOB INTO
+        s_first_name,
+        s_last_name,
+        s_bday
+    FROM
+        STUDENT
+    WHERE
+        S_ID = student_ID;
+    s_age := find_age(s_bday);
+    DBMS_OUTPUT.PUT_LINE('Student No.: ' || student_ID || chr(10) ||
+        'Name: ' || s_first_name || ' ' || s_last_name || chr(10) ||
+        'Date of Birthday: ' || s_bday || chr(10) ||
+        'Age: ' || s_age);
+EXCEPTION
+	WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Student with No. ''' || student_ID || ''' doesn''t exist!');
+END;
+/
+
+
+
+
+CREATE TABLE consultant
+(c_id NUMBER(6),
+c_last VARCHAR2(20),
+c_first VARCHAR2(20),
+c_mi CHAR(1),
+c_add VARCHAR2(30),
+c_city VARCHAR2(20),
+c_state CHAR(2),
+c_zip VARCHAR2(10),
+c_phone VARCHAR2(15),
+c_email VARCHAR2(30), 
+CONSTRAINT consultant_c_id_pk PRIMARY KEY (c_id));
+
+CREATE TABLE skill
+(skill_id NUMBER(3),
+skill_description VARCHAR2(50),
+CONSTRAINT skill_skill_id_pk PRIMARY KEY (skill_id));
+
+CREATE TABLE consultant_skill
+(c_id NUMBER(6),
+skill_id NUMBER(3),
+certification VARCHAR2(8),
+CONSTRAINT consultant_skill_pk PRIMARY KEY (c_id, skill_id),
+CONSTRAINT consultant_skill_c_id_fk FOREIGN KEY (c_id) REFERENCES consultant(c_id),
+CONSTRAINT consultant_skill_skill_id_fk FOREIGN KEY (skill_id) REFERENCES skill(skill_id));
+
+CREATE TABLE client
+(client_id NUMBER(6),
+client_name VARCHAR2(30),
+contact_last VARCHAR2(30),
+contact_first VARCHAR2(30),
+contact_phone VARCHAR2(15),
+CONSTRAINT client_client_id_pk PRIMARY KEY (client_id));
+
+CREATE TABLE project
+(p_id NUMBER(6),
+project_name VARCHAR2(30),
+client_id NUMBER(6),
+mgr_id NUMBER(6),
+parent_p_id NUMBER(6),
+CONSTRAINT project_pid_pk PRIMARY KEY (p_id),
+CONSTRAINT project_client_id_fk FOREIGN KEY (client_id) REFERENCES client(client_id),
+CONSTRAINT project_mgr_id_fk FOREIGN KEY (mgr_id) REFERENCES consultant(c_id));
+
+ALTER TABLE project
+ADD CONSTRAINT project_parent_pid_fk FOREIGN KEY (parent_p_id) REFERENCES project(p_id);
+
+CREATE TABLE project_skill
+(p_id NUMBER(6),
+skill_id NUMBER(3),
+CONSTRAINT project_skill_pk PRIMARY KEY (p_id, skill_id),
+CONSTRAINT project_skill_pid_fk FOREIGN KEY (p_id) REFERENCES project(p_id),
+CONSTRAINT project_skill_skill_id_fk FOREIGN KEY (skill_id) REFERENCES skill(skill_id));
+
+CREATE TABLE project_consultant
+(p_id NUMBER(6),
+c_id NUMBER(6),
+roll_on_date DATE,
+roll_off_date DATE,
+elapsed_time VARCHAR2(30),
+CONSTRAINT project_consultant_pk PRIMARY KEY (p_id, c_id),
+CONSTRAINT project_consultant_p_id_fk FOREIGN KEY (p_id) REFERENCES project(p_id),
+CONSTRAINT project_consultant_c_id_fk FOREIGN KEY (c_id) REFERENCES consultant(c_id));
+
+CREATE TABLE evaluation
+(e_id NUMBER(8),
+e_date DATE,
+p_id NUMBER(6),
+evaluator_id NUMBER(6),
+evaluatee_id NUMBER(6),
+score NUMBER(3),
+comments VARCHAR2(300),
+CONSTRAINT evaluation_e_id_pk PRIMARY KEY (e_id),
+CONSTRAINT evaluation_p_id_fk FOREIGN KEY (p_id) REFERENCES project(p_id),
+CONSTRAINT evaluation_evaluator_id_fk FOREIGN KEY (evaluator_id) REFERENCES consultant(c_id),
+CONSTRAINT evaluation_evaluatee_id_fk FOREIGN KEY (evaluatee_id) REFERENCES consultant(c_id));
+
+--insert values into CONSULTANT
+INSERT INTO consultant VALUES
+(100, 'Myers', 'Mark', 'F', '1383 Alexander Ave.', 'Eau Claire', 'WI', '54703', '7155559652', 'mmyers@swexpert.com');
+
+INSERT INTO consultant VALUES
+(101, 'Hernandez', 'Sheila', 'R', '3227 Brian Street', 'Eau Claire', 'WI', '54702', '7155550282', 'shernandez@earthware.com');
+
+INSERT INTO consultant VALUES
+(102, 'Zhang', 'Brian', NULL, '2227 Calumet Place', 'Altoona', 'WI', '54720', '7155558383', 'zhang@swexpert.com');
+
+INSERT INTO consultant VALUES
+(103, 'Carlson', 'Sarah', 'J', '1334 Water Street', 'Eau Claire', 'WI', '54703', '7155558008', 'carlsons@swexpert.com');
+
+INSERT INTO consultant VALUES
+(104, 'Courtlandt', 'Paul', 'R', '1911 Pine Drive', 'Eau Claire', 'WI', '54701', '7155555225', 'courtlpr@yamail.com');
+
+INSERT INTO consultant VALUES
+(105, 'Park', 'Janet', 'S', '2333 157th Street', 'Chippewa Falls', 'WI', '54712', '7155554944', 'jpark@swexpert.com');
+
+--insert values into SKILL
+INSERT INTO skill VALUES
+(1, 'VB .NET Programming');
+
+INSERT INTO skill VALUES
+(2, 'COBOL Programming');
+
+INSERT INTO skill VALUES
+(3, 'Java Programming');
+
+INSERT INTO skill VALUES
+(4, 'Project Management');
+
+INSERT INTO skill VALUES
+(5, 'Web Application Programming');
+
+INSERT INTO skill VALUES
+(6, 'Oracle Developer Programming');
+
+INSERT INTO skill VALUES
+(7, 'Oracle Database Administration');
+
+INSERT INTO skill VALUES
+(8, 'Windows NT/2000 Network Administration');
+
+INSERT INTO skill VALUES
+(9, 'Windows XP Network Administration');
+
+--insert values into CONSULTANT_SKILL
+INSERT INTO consultant_skill VALUES
+(100, 1, 'Y');
+
+INSERT INTO consultant_skill VALUES
+(100, 3, 'N');
+
+INSERT INTO consultant_skill VALUES
+(100, 6, 'Y');
+
+INSERT INTO consultant_skill VALUES
+(101, 4, 'N');
+
+INSERT INTO consultant_skill VALUES
+(101, 5, 'N');
+
+INSERT INTO consultant_skill VALUES
+(102, 7, 'Y');
+
+INSERT INTO consultant_skill VALUES
+(103, 1, 'Y');
+
+INSERT INTO consultant_skill VALUES
+(103, 6, 'Y');
+
+INSERT INTO consultant_skill VALUES
+(103, 8, 'Y');
+
+INSERT INTO consultant_skill VALUES
+(103, 9, 'Y');
+
+INSERT INTO consultant_skill VALUES
+(104, 8, 'N');
+
+INSERT INTO consultant_skill VALUES
+(104, 9, 'Y');
+
+INSERT INTO consultant_skill VALUES
+(105, 2, 'N');
+
+INSERT INTO consultant_skill VALUES
+(105, 3, 'N');
+
+INSERT INTO consultant_skill VALUES
+(105, 4, 'Y');
+
+--insert into CLIENT
+INSERT INTO client VALUES (1, 'Crisco Systems', 'Martin', 'Andrew', '5215557220');
+INSERT INTO client VALUES (2, 'Supreme Data Corporation', 'Martinez', 'Michelle', '5205559821');
+INSERT INTO client VALUES (3, 'Lucid Technologies', 'Brown', 'Jack', '7155552311');
+INSERT INTO client VALUES (4, 'Morningstar Bank', 'Wright', 'Linda', '9215553320');
+INSERT INTO client VALUES (5, 'Maverick Petroleum', 'Miller', 'Tom', '4085559822');
+INSERT INTO client VALUES (6, 'Birchwood Mall', 'Brenner', 'Nicole', '7155550828');
+
+--insert into PROJECT
+INSERT INTO project VALUES
+(1, 'Hardware Support Intranet', 2, 105, NULL);
+
+INSERT INTO project VALUES
+(2, 'Hardware Support Interface', 2, 103, 1);
+
+INSERT INTO project VALUES
+(3, 'Hardware Support Database', 2, 102, 1);
+
+INSERT INTO project VALUES
+(4, 'Teller Support System', 4, 105, NULL);
+
+INSERT INTO project VALUES
+(5, 'Internet Advertising', 6, 105, NULL);
+
+INSERT INTO project VALUES
+(6, 'Network Design', 6, 104, 5);
+
+INSERT INTO project VALUES
+(7, 'Exploration Database', 5, 102, NULL);
+
+--insert into PROJECT_SKILL
+INSERT INTO project_skill VALUES (1, 8);
+INSERT INTO project_skill VALUES (1, 9);
+INSERT INTO project_skill VALUES (2, 3);
+INSERT INTO project_skill VALUES (3, 6);
+INSERT INTO project_skill VALUES (3, 7);
+INSERT INTO project_skill VALUES (4, 2);
+INSERT INTO project_skill VALUES (4, 7);
+INSERT INTO project_skill VALUES (5, 5);
+INSERT INTO project_skill VALUES (5, 9);
+INSERT INTO project_skill VALUES (6, 9);
+INSERT INTO project_skill VALUES (7, 6);
+INSERT INTO project_skill VALUES (7, 7);
+
+--insert into PROJECT_CONSULTANT
+INSERT INTO project_consultant VALUES
+(1, 101, TO_DATE('06/15/2006', 'MM/DD/YYYY'), TO_DATE('12/15/2006', 'MM/DD/YYYY'), '92 00:00:00.00');
+
+INSERT INTO project_consultant VALUES
+(1, 104, TO_DATE('01/05/2006', 'MM/DD/YYYY'), TO_DATE('12/15/2006', 'MM/DD/YYYY'), '126 00:00:00.00');
+
+INSERT INTO project_consultant VALUES
+(1, 103, TO_DATE('01/05/2006', 'MM/DD/YYYY'), TO_DATE('06/05/2006', 'MM/DD/YYYY'), '5 00:00:00.00');
+
+INSERT INTO project_consultant VALUES
+(1, 105, TO_DATE('01/05/2006', 'MM/DD/YYYY'), TO_DATE('12/15/2006', 'MM/DD/YYYY'), '45 00:00:00.00');
+
+INSERT INTO project_consultant VALUES
+(2, 105, TO_DATE('07/17/2006', 'MM/DD/YYYY'), TO_DATE('09/17/2006', 'MM/DD/YYYY'), '25 00:00:00.00');
+
+INSERT INTO project_consultant VALUES
+(2, 100, TO_DATE('07/17/2006', 'MM/DD/YYYY'), TO_DATE('09/17/2006', 'MM/DD/YYYY'), '0 00:00:00.00');
+
+INSERT INTO project_consultant VALUES
+(3, 103, TO_DATE('09/15/2006', 'MM/DD/YYYY'), TO_DATE('03/15/2007', 'MM/DD/YYYY'), '125 00:00:00.00');
+
+INSERT INTO project_consultant VALUES
+(3, 104, TO_DATE('10/15/2006', 'MM/DD/YYYY'), TO_DATE('12/15/2006', 'MM/DD/YYYY'), '50 00:00:00.00');
+
+INSERT INTO project_consultant VALUES
+(4, 105, TO_DATE('06/05/2006', 'MM/DD/YYYY'), TO_DATE('06/05/2007', 'MM/DD/YYYY'), '25 00:00:00.00');
+
+INSERT INTO project_consultant VALUES
+(4, 104, TO_DATE('06/15/2006', 'MM/DD/YYYY'), TO_DATE('12/15/2006', 'MM/DD/YYYY'), '53 00:00:00.00');
+
+INSERT INTO project_consultant VALUES
+(4, 102, TO_DATE('07/15/2006', 'MM/DD/YYYY'), TO_DATE('12/15/2006', 'MM/DD/YYYY'), '30 00:00:00.00');
+
+INSERT INTO project_consultant VALUES
+(5, 105, TO_DATE('09/19/2006', 'MM/DD/YYYY'), TO_DATE('03/19/2007', 'MM/DD/YYYY'), '15 00:00:00.00');
+
+INSERT INTO project_consultant VALUES
+(5, 103, TO_DATE('09/19/2006', 'MM/DD/YYYY'), TO_DATE('03/19/2007', 'MM/DD/YYYY'), '15 00:00:00.00');
+
+INSERT INTO project_consultant VALUES
+(6, 103, TO_DATE('09/19/2006', 'MM/DD/YYYY'), TO_DATE('03/19/2007', 'MM/DD/YYYY'), '5 00:00:00.00');
+
+INSERT INTO project_consultant VALUES
+(6, 104, TO_DATE('09/19/2006', 'MM/DD/YYYY'), TO_DATE('03/19/2007', 'MM/DD/YYYY'), '10 00:00:00.00');
+
+INSERT INTO project_consultant VALUES
+(7, 102, TO_DATE('05/20/2006', 'MM/DD/YYYY'), TO_DATE('12/20/2006', 'MM/DD/YYYY'), '55 00:00:00.00');
+
+INSERT INTO project_consultant VALUES
+(7, 100, TO_DATE('05/25/2006', 'MM/DD/YYYY'), TO_DATE('12/20/2006', 'MM/DD/YYYY'), '100 00:00:00.00');
+
+--insert into EVALUATION
+INSERT INTO evaluation VALUES
+(100, TO_DATE('01/07/2007', 'MM/DD/YYYY'), 1, 105, 101, 90, NULL);
+
+INSERT INTO evaluation VALUES
+(101, TO_DATE('01/07/2007', 'MM/DD/YYYY'), 1, 105, 104, 85, NULL);
+
+INSERT INTO evaluation VALUES
+(102, TO_DATE('01/08/2007', 'MM/DD/YYYY'), 1, 105, 103, 90, NULL);
+
+INSERT INTO evaluation VALUES
+(103, TO_DATE('12/20/2006', 'MM/DD/YYYY'), 1, 103, 105, 100, NULL);
+
+INSERT INTO evaluation VALUES
+(104, TO_DATE('12/29/2006', 'MM/DD/YYYY'), 1, 104, 105, 75, NULL);
+
+INSERT INTO evaluation VALUES
+(105, TO_DATE('01/15/2007', 'MM/DD/YYYY'), 1, 101, 105, 90, NULL);
+
+COMMIT;
+
+select * from evaluation;
+select * from project_consultant;
+select * from project_skill;
+select * from  project;
+select * from  client;
+select * from  consultant_skill;
+select * from  skill ;
+select * from  consultant;
+
+
+We need to INSERT or UPDATE data of table consultant_skill , create needed functions, procedures … that accepts consultant id, skill id, 
+and certification status for the task. The procedure should be user friendly enough to handle all possible errors such as consultant id, 
+skill id do not exist OR certification status is different than ‘Y’, ‘N’. Make sure to display: Consultant last, first name, skill description and 
+the confirmation of the DML performed (hint: Do not forget to add COMMIT inside the procedure)
+
+
+
+create or replace procedure proc_consultant(p_c_id number,p_skill_id number,p_certification varchar2)
+as
+v_c_fname  consultant.c_first%type;
+v_c_lname  consultant.c_last%type;
+v_skill_desc skill.skill_description%type;
+existing_skill_id NUMBER;
+existing_cons_id NUMBER;
+begin
+       if p_certification in ('Y','N') THEN
+         select c_first,c_last,skill_description into v_c_fname,v_c_lname,v_skill_desc
+         from
+             consultant c join consultant_skill cs 
+             on c.c_id=cs.c_id
+             join skill s
+             on s.skill_id=cs.skill_id
+         where
+            cs.c_id=p_c_id and cs.skill_id=p_skill_id;
+        dbms_output.put_line(v_c_fname||' '||v_c_lname||' '||v_skill_desc);
+        UPDATE
+            CONSULTANT_SKILL
+        SET
+            CERTIFICATION = p_certification
+        WHERE
+            C_ID = p_c_id AND
+            SKILL_ID = p_skill_id; 
+       commit;
+       else
+              dbms_output.put_line('certification status dont have Y N status');
+      end if;
+exception
+       when no_data_found then
+       begin
+        select count(*) into existing_skill_id from skill where skill_id=p_skill_id;
+      end;
+      begin
+        select count(*) into existing_cons_id from consultant_skill where skill_id=p_c_id;
+      end;
+     if ((existing_skill_id>0) or (existing_cons_id>0)) then
+        insert into consultant_skill values(p_c_id,p_skill_id,p_certification);
+      dbms_output.put_line('row for the table consultant skill has been updated!!');
+      commit;
+     else
+       dbms_output.put_line('invalid skill id or consultant_id!!!');
+     end if;
+  
+end;
+
+    exec proc_consultant(100, 3, 'Z')
+
+    exec proc_consultant(100, 9, 'Y')
+
+    exec proc_consultant(100, 8, 'N');
+
+       exec proc_consultant(105, 8, 'Z');
+
+

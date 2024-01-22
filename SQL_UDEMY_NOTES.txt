@@ -1,0 +1,431 @@
+select salary from hr.employees e1 where (select count(distinct(salary)) from hr.employees e2 where e2.salary>e1.salary)=n-1;   max
+select salary from hr.employees e1 where (select count(distinct(salary)) from hr.employees e2 where e2.salary<e1.salary)=n-1;   min
+
+
+
+Restriction of data usage:
+-------------------------
+
+select * from hr.employees where salary>10000;
+
+select * from hr.employees where job_id='IT_PROG';
+/* where clause is used with comparision operator and logical */
+
+operation of != is same as <>
+
+
+
+Pattern matching:
+      like operator is used to perform wildcard searches and retieve the rows matching certain character pattern using wildcard operators(%,_)
+	  %  : This indicates , Matches any number of characters including 0 or more characters
+	  _  :This indicates , Matches exactly one character
+Note:
+     IN SQL String values is case sensitive, we have to mention exact name within single quote 
+	   ex: 'Bruce'
+	   
+/*NULL USAGE IN SQL*/
+note: =NULL is not same as IS NULL
+select * from hr.employees where commission_pct=NULL;
+
+select * from hr.employees where commission_pct IS  NULL;
+select * from hr.employees where commission_pct IS NOT NULL;
+
+
+
+/*Logical operators*/
+select count(*) from hr.employees where salary<12000 and job_id IN ('IT_PROG','ST_MAN');
+
+select * from hr.employees where salary<12000 and job_id NOT IN ('IT_PROG','ST_MAN');
+
+select count(*) from hr.employees where salary<12000 OR job_id IN ('IT_PROG','ST_MAN');
+
+JOINS:
+-----
+   -it is used to combine rows from two or more tables, using common column name between those tables
+   -Joins are used to join the two or more tables , and retrive the different tables info in one query
+
+(INNER) JOIN: Returns records that have matching values in both tables
+LEFT (OUTER) JOIN: Returns all records from the left table, and the matched records from the right table
+RIGHT (OUTER) JOIN: Returns all records from the right table, and the matched records from the left table
+FULL (OUTER) JOIN: Returns all records when there is a match in either left or right table
+
+exercise ex:
+inner join:
+----------
+select job_id,location_id from hr.employees e inner join hr.departments d on e.department_id=d.department_id;
+joining 3 tables:
+select first_name,department_name,job_title from 
+           hr.employees e inner join hr.departments d on e.department_id=d.department_id
+                           inner join hr.jobs j on e.job_id=j.job_id;
+	
+
+	
+create table toy(
+             toys_id integer,
+			 toys_name varchar2(10),
+             toys_colour varchar2(10),	 
+             brick_id integer
+				);	   
+create table bricks(
+             brick_id integer,
+             brik_colour varchar2(10),			 
+             brick_shape varchar2(10)
+				);
+select * from bricks;
+select * from toys;
+
+desc bricks;
+desc toys;
+
+insert into toy values(1,'Snuggles','pink',2);
+insert into toy values(2,'Assurus','blue',4);
+
+insert into toy values(3,'Turtles','green',3);
+insert into toy values(5,'Turtles','green',1);
+insert into toy values(6,'Turtles','green',7);
+
+
+insert into bricks values(1,'pink','cube');
+insert into bricks values(2,'blue','cube');
+
+insert into bricks values(3,'green','pyramid');
+insert into bricks values(4,'green','pyramid');	
+insert into bricks values(5,'black','pantagon');
+alter table toys add column brick_id number not null;					   
+						   
+TOYS_ID	TOYS_NAME	TOYS_COLOUR	BRICK_ID
+1	Snuggles	     pink	     2
+2	Assurus	         blue	     4
+3	Turtles	        green	     3
+5	Turtles	        green	     1
+6   Turtles         green        7
+BRICK_ID	BRIK_COLOUR	BRICK_SHAPE
+1	         pink	   cube
+2	         blue	   cube
+3	         green	   pyramid
+4	         green	   pyramid
+5            black     pantagon
+
+
+cross join:
+     Each row of the first table mapped / linked with the all the rows in the second table
+	  5 rows from t1 and 5 row from t2
+	  total rows:25
+	  
+	  TOYS_ID	TOYS_NAME	TOYS_COLOUR	BRICK_ID	BRICK_ID	BRIK_COLOUR	BRICK_SHAPE
+1	Snuggles	pink	2	1	pink	cube
+1	Snuggles	pink	2	2	blue	cube
+1	Snuggles	pink	2	3	green	pyramid
+1	Snuggles	pink	2	4	green	pyramid
+1	Snuggles	pink	2	5	black	pantagon
+2	Assurus	blue	4	1	pink	cube
+2	Assurus	blue	4	2	blue	cube
+2	Assurus	blue	4	3	green	pyramid
+2	Assurus	blue	4	4	green	pyramid
+2	Assurus	blue	4	5	black	pantagon
+3	Turtles	green	3	1	pink	cube
+3	Turtles	green	3	2	blue	cube
+3	Turtles	green	3	3	green	pyramid
+3	Turtles	green	3	4	green	pyramid
+3	Turtles	green	3	5	black	pantagon
+5	Turtles	green	1	1	pink	cube
+5	Turtles	green	1	2	blue	cube
+5	Turtles	green	1	3	green	pyramid
+5	Turtles	green	1	4	green	pyramid
+5	Turtles	green	1	5	black	pantagon
+6	Turtles	green	7	1	pink	cube
+6	Turtles	green	7	2	blue	cube
+6	Turtles	green	7	3	green	pyramid
+6	Turtles	green	7	4	green	pyramid
+6	Turtles	green	7	5	black	pantagon
+	 
+inner join:
+    It returns the matching records from the both tables
+	 
+   select toys_name,brik_colour from toy inner join bricks on  toy.brick_id=bricks.brick_id;
+   
+   TOYS_NAME	BRIK_COLOUR
+    Turtles	       pink
+    Snuggles	   blue
+    Turtles	       green
+    Assurus	       green
+left join:
+---------
+It returns all the records from the left table and matched records from the right table
+
+   select toys_name,brik_colour from toy left join bricks on  toy.brick_id=bricks.brick_id
+      select toys_name,brik_colour from toy left outer join bricks on  toy.brick_id=bricks.brick_id;
+
+
+       TOYS_NAME	BRIK_COLOUR
+          Turtles	pink
+         Snuggles	blue
+           Turtles	green
+          Assurus	green
+           Turtles	 - 
+
+Right join:  
+    It returns all records from right table and matched records from the left table
+
+ select toys_name,brik_colour from toy right join bricks on  toy.brick_id=bricks.brick_id
+ select toys_name,brik_colour from toy right outer join bricks on  toy.brick_id=bricks.brick_id;
+     
+	 Snuggles   	blue
+     Assurus	   green
+     Turtles	   green
+     Turtles	   pink
+      - 	       black
+	  
+full outer join:
+    Returns all records when there is a match in either left or right table  
+	
+	
+     select toys_name,brik_colour from toy full join bricks on toy.brick_id=bricks.brick_id;
+	 select toys_name,brik_colour from toy full outer join bricks on toy.brick_id=bricks.brick_id;
+
+    
+	 TOYS_NAME	BRIK_COLOUR
+      -           	black
+    Turtles	        pink
+    Snuggles	    blue
+    Turtles      	green
+    Assurus	       green
+    Turtles	         - 	  
+	  
+	  
+	  
+natural join:
+        Natural Join joins two tables based on the same attribute name and datatypes. 
+		The resulting table will contain all the attributes of both the table 
+		but keep only one copy of each common column
+		                               --------------
+
+link:
+      https://www.geeksforgeeks.org/difference-between-natural-join-and-inner-join-in-sql/
+	  
+select * from toy natural join bricks;
+
+BRICK_ID	TOYS_ID	TOYS_NAME	TOYS_COLOUR	BRIK_COLOUR	BRICK_SHAPE
+1	5	Turtles	green	pink	cube
+2	1	Snuggles	pink	blue	cube
+3	3	Turtles	green	green	pyramid
+4	2	Assurus	blue	green	pyramid
+
+	  
+	  
+	  
+	  NATURAL JOIN	                                                                    INNER JOIN
+1.	Natural Join joins two tables based on same attribute name and datatypes.	Inner Join joins two table on the basis of the column
+                                                                                 which is explicitly specified in the ON clause.
+2.	In Natural Join, The resulting table will contain all the attributes of 
+both the tables but keep only one copy of each common column	
+                                                                                In Inner Join, The resulting table will contain all the attribute of both the tables 
+
+																				 including duplicate columns also
+3.	In Natural Join, If there is no condition specifies then 
+it returns the rows based on the common column	
+                                                                              In Inner Join, only those records will return which exists in both the tables
+4.	SYNTAX: 
+SELECT * 
+FROM table1 NATURAL JOIN table2; 
+ 	                                                                       SYNTAX: 
+                                                                                 SELECT * 
+                                                                                     FROM table1 INNER JOIN table2 ON table1.Column_Name = table2.Column_Name; 
+																					 
+																					 
+																					 
+																					 
+																					 
+self join:
+---------
+       A self join is a regular join, but the table is joined with itself.
+	   
+	   SELECT column_name(s)
+       FROM table1 T1, table1 T2
+       WHERE condition;
+note: T1 and T2 are different table aliases for the same table.
+
+ex:
+   select e1.first_name as my_name,e2.first_name as my_friend_name 
+   from hr.employees e1,hr.employees e2 where e1.department_id=e2.department_id;
+   
+     MY_NAME	MY_FRIEND_NAME
+       Ellen	Ellen
+      Sundar	Ellen
+       Amit	    Ellen
+      Elizabeth	Ellen
+	  
+summary:
+
+--inner join
+   select toys_name,brik_colour,brick_shape from toy inner join bricks on  toy.brick_id=bricks.brick_id;
+--left join
+      select toys_name,brik_colour,brick_shape from toy left outer join bricks on  toy.brick_id=bricks.brick_id;
+--right join
+     select toys_name,brik_colour from toy right join bricks on  toy.brick_id=bricks.brick_id;
+--cross join
+       select *  from toy cross join bricks;
+--full outer join
+     select toys_name,brik_colour from toy full join bricks on toy.brick_id=bricks.brick_id
+--natural join
+      select * from toy natural join bricks;
+--self join
+   select e1.first_name as my_name,e2.first_name as my_friend_name 
+   from hr.employees e1,hr.employees e2 where e1.department_id=e2.department_id;
+   
+   
+   
+  
+  UNIONS:
+  
+  unions operator is used to combine the result set of two or more select statements
+  
+  conditions:
+ -Every SELECT statement within UNION must have the same number of columns
+ -The columns must also have similar data types
+ -The columns in every SELECT statement must also be in the same order
+ 
+    select toys_colour from toy
+union
+select brik_colour from bricks;
+
+RESULT_TB
+black
+blue
+green
+pink
+ 
+ UNION ALL:
+ The UNION operator selects only distinct values by default. To allow duplicate values, use UNION ALL:)
+ 
+ select toys_colour from toy
+union all
+select brik_colour from bricks;
+
+
+
+Inetersect:
+---------
+The INTERSECT operator in SQL is used to retrieve the records that are identical/common
+ between the result sets of two SELECT (tables) statements.
+ 
+ select toys_colour from toy
+intersect
+select brik_colour from bricks;
+
+TOYS_COLOUR
+blue
+green
+pink
+
+
+SQL Minus:
+-------
+The Minus is an operator in Structured Query Language, which is used with two SELECT queries.
+
+This operator returns only unique records of the first table, not the common records of both tables.
+
+note:The data type and the number of fields must be the same for every 
+SELECT statement connected with the Minus SQL operator.
+
+select brick_id from toy
+minus
+select brick_id from bricks;
+
+
+BRICK_ID
+7
+
+select brick_id from bricks
+minus
+select brick_id from toy;
+
+BRICK_ID
+5
+
+
+
+
+SINGLE ROW FUNCTION:
+-------------------
+	Functions: Functions are created for manipulating data and returning value
+Types:
+single-row functions and multiple-row functions(group functions)
+SRF: Single input and single output
+MRF: Multiple input an single output
+
+  function_name(arg1,arg2,ar3,,,)
+  
+ Single row functions:
+ --------------------
+ -Single row functions are operate on single rows and return only one result per row
+ -Accept one or more arguments and return one value
+ -Return value for each row returned 
+ -can be used alone or nested (function within function)
+ -column or an expression can be used ad arguments
+ -The returning datatype can be different than the input data types
+ -Can be used in SELECT , WHERE or ORDER BY Clauses
+   SELECT function_name[(arg1, arg2,...)] FROM dual;
+   
+   Types of single row functions:
+  1.Character functions
+  2.Numeric Functions
+  3.Date Functions
+  4.Conversion Functions
+  5.General functions
+
+
+Character Functions:
+   It takes character data as input and return character or numeric data as output
+   two types of character functions:
+   
+   NOTE:-Character comparision in oracle is case sensitive('A'='a')
+        -In oracle sql index value start from 1 
+   
+    1.Case conversion functions(UPPER,LOWER,INITCAP)
+	  -LOWER('Adam SMITH') ==> adam smith
+	  -UPPER('Adam SMITH') ==> ADAM SMITH
+	  -INITCAP('Adam SMITH') ==> Adam Smith
+	    SELECT UPPER(first_name) from hr.employees;
+		SELECT LOWER(first_name) from hr.employees;
+		SELECT INITCAP(first_name) from hr.employees;
+	2.Character Manipulation functions(SUBSTR,LENGTH,CONCAT,INSTR,TRIM,REPLACE,LPAD|RPAD)
+	
+	-SUBSTR(source_string,position[,length])
+	-LENGTH(string)
+	select SUBSTR(first_name,1,4),SUBSTR(first_name,3) ,last_name,LENGTH(last_name) from hr.employees;
+	-Concat(string1,string2)
+	select CONCAT(first_name,last_name) as full_name from hr.employees;
+    select first_name||' '|| last_name as Full_Name from hr.employees;
+	
+	-INSTR(string,substring[,position,occurrence])
+	SELECT INSTR('I am learning how to use functions in sql','s') from dual; --23
+	SELECT INSTR('I am learning how to use functions in sql','sql',1) from dual; --39
+	SELECT INSTR('I am learning how to use functions in sql','s',1,2) from dual; --34
+	SELECT INSTR('I am learning how to use functions in sql','r',-1,1) from dual; --9
+	SELECT INSTR('I am learning how to use functions in sql','r',-1,2) from dual; --0
+	SELECT first_name,instr(first_name,'b') from hr.employees
+	
+	-TRIM([[LEADING|TRAILING|BOTH] trim_character FROM] string)
+	     :It generally removes all the spaces before and after the string by default
+	-LTRIM(string,[trim_string])
+	-LTRIM(string,[trim_string])
+	SELECT TRIM('    I am from karnataka  ') from dual;
+	SELECT TRIM(' ' FROM '   I am from Karnataka   ') from dual;
+	SELECT TRIM(BOTH ' ' FROM '   I am from Karnataka   ') from dual;
+	SELECT TRIM(TRAILING ' ' FROM '     I am from Karnataka     ') from dual;
+	SELECT TRIM(LEADING ' ' FROM '      I am from Karnataka      ') from dual;
+	SELECT TRIM(TRAILING 'a' FROM 'i am from Karnataka') from dual; --i am from Karnatak
+	SELECT TRIM(LEADING 'a' FROM 'am from Karnataka') from dual;    --m from Karnatak
+	SELECT TRIM(LEADING 'a' FROM 'i am from Karnataka') from dual; --i am from Karnataka
+    SELECT TRIM(LEADING 'am' FROM 'i am from Karnataka') from dual; --error:trim set should have only one character
+	
+	--LTRIM and RTRIM
+	SELECT LTRIM('    I AM SICK OF SOMETHING    ') from dual;  --I AM SICK OF SOMETHING 
+	SELECT RTRIM('    I AM SICK OF SOMETHING    ') from dual;  --    I AM SICK OF SOMETHING
+	SELECT LTRIM('SICK OF SOMETHING','SICK') from dual;
+	SELECT RTRIM('I AM SICK OF','OF') from dual; --I AM SICK 
+	SELECT RTRIM('I AM SICK ooOOOFF','F') from dual;  --I AM SICK ooOOO
+
+
+		
