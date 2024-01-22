@@ -1,0 +1,410 @@
+creating and using packages:
+
+packages are the container which can have procedures,functions,variables,types,collections,exceptions and ...
+
+
+Advantages of packages:
+    -Modularity  (we can use and share different objects in the packages like subprograms )
+    -Easy Maintenance
+    -Encapsulation and security(other users cant access the info , 
+	if u specified it in the pacakage body, but for the all users we can specify the data in the package spec)
+	-Functionality
+	-Performance
+	-OverLoading(in packages overloding is easy and faster)
+	
+	
+main two reasons of using packages:
+         1.Logically grouping of objects (it reduces the code complexity and crowded code);
+		 2.Performance
+		 
+		 
+		 
+		 
+	package object visibility:
+	1.local variables  (only accessible to its own object, declared in the subprograms)
+	2.public variables  (accessible to all who as privilage to access,declared in the package spec)
+	3.private variables  (accessible for all objects within the package body, its declared in the package body)
+	
+	PERSISTENT state of packages:
+	---------------------------
+  PGA(Program/private global area):>(its stores the objects,variables, no other users can see or touch/reach these objects, every user has there own PGA'S)
+  
+  
+                                                                                        Storage(obj,var,codes,packages)
+  
+  
+  SGA(System/shared global area):>>its stored shared objects,valuses,codes,packages for all other users
+
+
+note : pga and sga refer to same memory with diff name
+
+
+1>>>>>
+
+--------------------------------------------------------------------------------------------------------------------
+--------------------------------------------CREATING & USING PACKAGES-----------------------------------------------
+--------------------------------------------------------------------------------------------------------------------
+----------------- Creating first package specification
+CREATE OR REPLACE 
+PACKAGE EMP AS 
+  v_salary_increase_rate number := 0.057; 
+  cursor cur_emps is select * from employees;
+  
+  procedure increase_salaries;
+  function get_avg_sal(p_dept_id int) return number;
+END EMP;
+----------------- Creating the package body
+CREATE OR REPLACE
+PACKAGE BODY EMP AS
+  procedure increase_salaries AS
+  BEGIN
+    for r1 in cur_emps loop
+      update employees_copy set salary = salary + salary * v_salary_increase_rate;
+    end loop;
+  END increase_salaries;
+  function get_avg_sal(p_dept_id int) return number AS
+  v_avg_sal number := 0;
+  BEGIN
+    select avg(salary) into v_avg_sal from employees_copy where
+          department_id = p_dept_id;
+    RETURN v_avg_sal;
+  END get_avg_sal;
+END EMP;
+----------------- using the subprograms in packages
+exec EMP_PKG.increase_salaries;
+----------------- using the variables in packages
+begin
+  dbms_output.put_line(emp_pkg.get_avg_sal(50));
+  dbms_output.put_line(emp_pkg.v_salary_increase_rate);
+end;
+
+2>>>>>
+
+---------------------------------------------------------------------------------------------
+--------------------------------VISIBILITY OF VARIABLES IN PACKAGES--------------------------
+---------------------------------------------------------------------------------------------
+create or replace PACKAGE BODY EMP_PKG AS
+  
+  v_sal_inc int := 500;
+  v_sal_inc2 int := 500;
+  
+  procedure print_test is
+  begin
+    dbms_output.put_line('Test : '|| v_sal_inc);
+  end;
+  
+  procedure increase_salaries AS
+  BEGIN
+    for r1 in cur_emps loop
+      update employees_copy set salary = salary + salary * v_salary_increase_rate
+      where employee_id = r1.employee_id;
+    end loop;
+  END increase_salaries;
+  function get_avg_sal(p_dept_id int) return number AS
+  v_avg_sal number := 0;
+  BEGIN
+    print_test;
+    select avg(salary) into v_avg_sal from employees_copy where
+          department_id = p_dept_id;
+    RETURN v_avg_sal;
+  END get_avg_sal;
+  
+END EMP_PKG;
+
+ --------illegal object Reference and Forward declaration--------------------------------
+----------------- 
+create or replace PACKAGE BODY EMP_PKG AS
+  
+  v_sal_inc int := 500;
+  v_sal_inc2 int := 500;
+  function get_sal(e_id employees.employee_id%type) return number;
+  
+procedure print_test is
+  begin
+    dbms_output.put_line('Test : '|| v_sal_inc);
+    dbms_output.put_line('Test salary : '|| get_sal(102));
+  end;
+  procedure increase_salaries AS
+  BEGIN
+    for r1 in cur_emps loop
+      update employees_copy set salary = salary + salary * v_salary_increase_rate
+      where employee_id = r1.employee_id;
+    end loop;
+  END increase_salaries;
+  function get_avg_sal(p_dept_id int) return number AS
+  v_avg_sal number := 0;
+  BEGIN
+    print_test;
+    select avg(salary) into v_avg_sal from employees_copy where
+          department_id = p_dept_id;
+    RETURN v_avg_sal;
+  END get_avg_sal;
+  
+  function get_sal(e_id employees.employee_id%type) return number is
+  v_sal number := 0;
+  begin
+    select salary into v_sal from employees where employee_id = e_id;
+  end;
+  
+end;
+   -------------------------------------Package Initialization---------------------
+
+  create or replace PACKAGE BODY EMP_PKG AS
+  
+  v_sal_inc int := 500;
+  v_sal_inc2 int := 500;
+  
+  procedure increase_salaries AS
+  BEGIN
+    for r1 in cur_emps loop
+      update employee_cpy set salary = salary + salary * v_salary_increase_rate
+      where employee_id = r1.employee_id;
+    end loop;
+  END increase_salaries;
+  function get_avg_sal(p_dept_id int) return number AS
+  v_avg_sal number := 0;
+  BEGIN
+    select avg(salary) into v_avg_sal from employee_cpy where
+          department_id = p_dept_id;
+    RETURN v_avg_sal;
+  END get_avg_sal;
+begin
+    -- It will overiden the previously initialiazed values in the package spec
+      v_salary_increase_rate :=1500;
+      insert into logs values('EMP_PKG','Package Initialiazed',sysdate);
+END EMP_PKG;
+
+create table logs(log_source varchar2(100),log_message varchar2(1000),log_date date);
+
+exec dbms_output.put_line(emp_pkg.get_avg_sal(100));
+exec dbms_output.put_line(emp_pkg.v_salary_increase_rate);
+
+select * from logs;
+desc logs;       
+			  
+	
+
+3>>>>
+---------------------------------------------------------------------------------------------
+----------------------------------PERSISTENT STATE OF PACKAGES-------------------------------
+--------------------------------------------------------------------------------------------- 
+----------------- 
+execute dbms_output.put_line(constants_pkg.v_salary_increase);
+grant execute on constants_pkg to my_user;
+revoke execute on constants_pkg from my_user;
+----------------- 
+----------------- 
+begin
+  constants_pkg.v_company_name := 'ACME';
+  dbms_output.put_line(constants_pkg.v_company_name);
+  dbms_lock.sleep(20); 
+end;
+exec dbms_output.put_line(constants_pkg.v_company_name);
+----------------- 
+create or replace package constants_pkg is
+PRAGMA SERIALLY_REUSABLE;
+  v_salary_increase constant number:= 0.04;
+  cursor cur_emps is select * from employees;
+  t_emps_type employees%rowtype;
+  v_company_name varchar2(20) := 'ORACLE';
+end;
+----------------- 
+begin
+  constants_pkg.v_company_name := 'ACME';
+  dbms_output.put_line(constants_pkg.v_company_name);
+  dbms_lock.sleep(20); 
+end;
+----------------- 
+declare
+v_emp employees%rowtype;
+begin
+ open constants_pkg.cur_emps;
+ fetch constants_pkg.cur_emps into v_emp;
+ dbms_output.put_line(v_emp.first_name);
+ close constants_pkg.cur_emps;
+end;
+----------------- 
+declare
+v_emp employees%rowtype;
+begin
+ fetch constants_pkg.cur_emps into v_emp;
+ dbms_output.put_line(v_emp.first_name);
+end;
+
+4>>>>>>>>>>
+
+---------------------------------------------------------------------------------------------
+---------------------------------USING COLLECTIONS IN PACKAGES-------------------------------
+---------------------------------------------------------------------------------------------
+   -it will make code more powerful and more efficient, we can also share the collections amoung other subprograms
+
+
+create or replace PACKAGE EMP_PKG AS 
+  type emp_table_type is table of employees%rowtype index by pls_integer;
+  v_salary_increase_rate number := 1000; 
+  v_min_employee_salary number := 5000;
+  cursor cur_emps is select * from employees;
+  
+  procedure increase_salaries;
+  function get_avg_sal(p_dept_id int) return number;
+  v_test int := 4;
+  function get_employees return emp_table_type;
+  function get_employees_tobe_incremented return emp_table_type;
+  procedure increase_low_salaries;
+  function arrange_for_min_salary(v_emp employees%rowtype) return employees%rowtype;
+END EMP_PKG;
+----------------- package body
+create or replace PACKAGE BODY EMP_PKG AS
+  
+  v_sal_inc int := 500;
+  v_sal_inc2 int := 500;
+  function get_sal(e_id employees.employee_id%type) return number;
+  procedure print_test is
+  begin
+    dbms_output.put_line('Test : '|| v_sal_inc);
+    dbms_output.put_line('Tests salary :'|| get_sal(102));
+  end;
+  
+  procedure increase_salaries AS
+  BEGIN
+    for r1 in cur_emps loop
+      update employees_copy set salary = salary + salary * v_salary_increase_rate
+      where employee_id = r1.employee_id;
+    end loop;
+  END increase_salaries;
+  function get_avg_sal(p_dept_id int) return number AS
+  v_avg_sal number := 0;
+  BEGIN
+  print_test;
+    select avg(salary) into v_avg_sal from employees_copy where
+          department_id = p_dept_id;
+    RETURN v_avg_sal;
+  END get_avg_sal;
+  
+  function get_sal(e_id employees.employee_id%type) return number is
+  v_sal number := 0;
+  begin
+    select salary into v_sal from employees where employee_id = e_id;
+    return v_sal;
+  end;
+  /*
+    This function returns all the employees in employees table
+  */
+  function get_employees return emp_table_type is
+  v_emps emp_table_type;
+  begin
+    for cur_emps in (select * from employees_copy) loop
+      v_emps(cur_emps.employee_id) := cur_emps;
+    end loop;
+    return v_emps;
+  end;
+  /*
+    This function returns the employees which are under the minimum salary
+    of the company standards and to be incremented by the new minimum salary
+  */
+  function get_employees_tobe_incremented return emp_table_type is
+  v_emps emp_table_type;
+  i employees.employee_id%type;
+  begin
+  v_emps := get_employees;
+  i := v_emps.first;
+    while i is not null loop
+      if v_emps(i).salary > v_min_employee_salary then
+        v_emps.delete(i);
+      end if;
+      i := v_emps.next(i);
+    end loop;
+    return v_emps;
+  end;
+  /*
+    This procedure increases the salary of the employees who has a less salary
+    then the company standard
+  */
+  procedure increase_low_salaries as
+  v_emps emp_table_type;
+  v_emp employees%rowtype;
+  i employees.employee_id%type;
+  begin
+  v_emps := get_employees_tobe_incremented;
+    i := v_emps.first;
+    while i is not null loop
+    v_emp := arrange_for_min_salary(v_emps(i));
+      update employees_copy set row = v_emp    
+        where employee_id = i;
+    i := v_emps.next(i);
+    end loop;
+  end increase_low_salaries;
+  /*
+    This function returns the employee by arranging the salary based on the 
+    company standard.
+  */
+  function arrange_for_min_salary(v_emp in out employees%rowtype) return employees%rowtype is
+  begin
+    v_emp.salary := v_emp.salary + v_salary_increase_rate;
+    if v_emp.salary < v_min_employee_salary then
+      v_emp.salary := v_min_employee_salary;
+    end if;
+    return v_emp;
+  end;
+  /**********************************************/
+  /*package initialization*/
+BEGIN
+  v_salary_increase_rate := 500;
+  insert into logs values ('EMP_PKG','Package initialized!',sysdate);
+END EMP_PKG;
+
+==========================================================================
+select * from hr.employees;
+select * from employees_copy;
+truncate table employees_copy;
+------------------------------------
+insert into employees_copy  select * from hr.employees;
+-----------------------------------
+execute emp_pkg.increase_low_salaries;
+--------------------------------------
+select * from employees_copy where salary <5000;
+
+
+----------------------------------*********************-------------------------------
+find packages:
+--------------
+
+two ways:
+1.sql developer tool
+2.Data dictionary views
+    >>>>>the data dictionary views that you can find some information about the packages are:
+                          -USER_SOURCE/ALL_SOURCE/DBA_SOURCE
+						  -USER_OBJECTS/ALL_OBJECTS/DBA_OBJECTS
+
+    *select * from user_source;
+	*select * from user_source where type='PACKAGE BODY' and name ='EMP_PKG';
+	
+	important info for DBA and develper is toc check status of the objects
+	*select * from user_objects;
+	*select * from user_objects where object_type='PACKAGE BODY' and object_name ='EMP_PKG';
+	
+	select * from user_objects where status ='invalid';
+	
+select * from user_source;
+
+select * from user_source where type='PACKAGE BODY' and name ='EMP_PKG';
+select * from user_objects;
+
+select * from user_objects where object_type='PACKAGE BODY' and object_name ='EMP_PKG';
+
+select * from user_objects where status ='invalid';
+
+
+
+OVERLOADING:
+    1.same name with different subprograms(one procedure, other one is function)
+    2.same name with different argument type
+    3.same name with difference in number of argument
+    4.same name with different order of execution
+    5.same name , same argument type, with diff argument name, but giving NAMED NOTATION of argumrnt name to the specific argument value
+    6.same name,same argument/parameter name but with different in type of the argument
+    7.same name ,but datatype family has to be different
+               like we cant use overloading like this, its wrong
+                           procedure test(v_name varchar2)
+                           procedure test(v_name char)
+    8.cant overload by parameter mode

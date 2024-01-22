@@ -1,0 +1,115 @@
+Hi Team, Please find today's topic 
+
+DDL 
+DML 
+TCL 
+Contraints 
+Db Objects 
+Synonyms
+view 
+Mview
+
+Below questions for interview based for your reference 
+
+How to add multiple new column in a existing table with single command (practice yet to be done)
+    -ALTER TABLE table_name
+	ADD column1 column1_definition;
+	ADD column2 column2_definition;
+	ADD column3 column3_definition;
+      ...
+    ADD column columnn_definition;
+	
+How to increase the length of the column
+   -ALTER TABLE table_name MODIFY column_name varchar(new_length);
+   
+   ex:
+    ALTER TABLE toy MODIFY toys_name varchar(50);
+
+how to change a data type of a column which has data inside 
+        1 - Create the new column at the end of the table.
+		2 - Run an update to populate the new table column
+		3 - Drop the old table column
+		4 - Re-name the new column to the original column name
+		
+how to rename a column
+      alter table table_name rename column old_column_name to new_column_name;
+How to create a copy of table with data 
+    create table new_table as select * from old_table;
+how to create a copy of a table without data 
+    create table new_table as select * from old_table where 2=1;
+	
+get the answer for below code
+
+create table t1 (num number);
+    -table t1 created
+insert into t1 values (10);
+    -value 10 inserted to num
+insert into t1 values (20);
+    -value 20 inserted to num
+
+insert into t1 values (30);
+    -value 30 inserted to num
+
+insert into t1 values (40);
+    -value 40 inserted to num
+
+insert into t1 values (50);
+    -value 50 inserted to num
+
+Select * From t1;
+    -data retrieved from table t1
+
+Rollback;
+    -ROLLBACK is a SQL command that undo the transactions that is not saved/ not committed.
+ 
+
+What is Truncate
+   -truncate commond will erase all the data from the table
+     truncate table t1;
+
+what are the options can be used with alter command
+*The ALTER TABLE statement is used to add, delete, or modify columns in an existing table
+*The ALTER TABLE statement is also used to add and drop various constraints on an existing table.
+    -alter table add column_name data_type
+	-alter table rename column old_column_name to new_column_name
+	-alter table drop column column_name;
+
+Can we execute rollback for truncate statement?
+  -we cannot roll back a TRUNCATE TABLE statement.
+
+
+Contraints qs
+
+1.Diff between unique key and primary key 
+    primary key                                                           unique key
+	1.each table contains only one primry key                         -more than one unique can be present in the table
+	2.primary key wont stores the null values                         -it will store the null values
+	3.primary key not allow to delete or modefy the data              -unique key allows
+   
+2.diff between primary key and foreign key
+           primary key                                                     foriegn key
+   1.each table should contain only one primary key                        -more then one foriegn key possible in the table
+   2.A primary key is a unique identifier for each record in a table       -foriegn key establish the connection between two table
+   3
+
+
+
+3. Can you refer unique + not null constraint column as foreign key
+    yes
+4. how to add not null constraint to a column 
+     ALTER TABLE Persons
+      MODIFY Age int NOT NULL;
+
+5. what is composite primary key
+    
+6.how many primary key is allowed for a table
+   -one
+7. how to remove notnull constraint from a table 
+8. how to list all constraints? 
+			SELECT INFORMATION
+		FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+		WHERE TABLE_NAME='TABLE_NAME';
+		
+  -select * from USER_CONSTRAINTS where TABLE_NAME='PERSONS';
+9. how to check a column having constraint or not ? 
+      user

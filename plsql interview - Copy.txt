@@ -1,0 +1,140 @@
+
+1.diff between stored procedure and stored functions
+2.can we use out parameter in functions 
+   - we can use out parameter in function , but we cant call from sql statements, and also we cant prform dml operation
+3.can we use multiple return values using functions
+  -yes possible using,return refcursor and also out parameter
+4.Bulk collect usage
+  -instead use of cursors, we can use dynamic sql execute emmidiate bulk collect with use of plsql collection (nested table or associated array)
+  so we can fetch huge record in one go....
+5.can we use commit statement in trigger body
+ -yes possible, we have to mention pragma autonomous transaction  
+    log file, yes or no, error store in logs
+	
+6.rank() and denserank()
+     -rank and dense rank functions are used in sql to assign ranking to each row in result set
+     -rank skips if it finds same value, denserank not skips print all , eventhogh if it find same value
+7.dynamic sql
+      - bind variables, hard parsing
+	  - use dbms_sql and bind variables at run time it will keep both place holders and values,it will not go for hard parsing again and again
+	  
+8.cblob, bblob
+
+9.diff between the package and procedure
+10.collection in plsql
+11.why use of refcursor instead of normal cursor
+
+ : can allocate select statement dynamically in refcursor
+ 
+12.Mutating table error
+  -when trigger is already fired using the table, we using same table when try to do dml operation ,
+    we will come across the mutating error
+  -we can reduce it by use of compound trigger and not to do the dml operation in row level trigger
+  
+13.difference between %type and %rowtype
+
+    -%type , using %type we can store single column value into the variable
+	-%rowtype , variable can contain/hold/store one complete row , having different columns in the table, while creating record type , we use %rowtype
+	
+14. cursor and cursor for loop
+
+15.We created procedure to do the dml operation on table, and we created trigger on same table, what will happen
+  result: Mutating table error.
+  
+16.diff between before and after row level and statement level trigger
+    before statement level trigger
+	    -trigger will fire before the execution of sql statement
+	before row level trigger
+	    -trigger will fire before the execution of each row
+	after row level trigger
+	    -trigger will fire after the execution of each row
+	after statement level trigger
+	    -trigger will fire after the execution of complete sql statement
+		
+17.Dff between pragma_exception_init and raise_application_errror
+    
+	 -pragma_exception_init is used to handle the exception, developer will write the exception name and error code using this procedure
+	 
+	 -raise_application_errror is used to raise the exception to caller, it will not handle that exception , instead it will pass the exception to caller
+
+       
+18.exceptions and its types
+     it is a abnormal condition or bugg occurs during runtime
+	 exceptions can be handled
+	 
+19.diff between varchar and varchar2
+
+   varchar :ANSI (it will distinguidh between NULL and empty) (it takes null values)
+   varchar2:Standard(it will distinguish between null and empty)(it wont take null values, it consider 0)
+
+
+views:
+-----create or replace view k_view as select * from emp_copy;
+  --ORA-00942: table or view does not exist 
+
+--use of FORCE keyword
+create or replace force view k_view0 as select * from emp_copy;
+  --Errors: VIEW K_VIEW
+  --Line/Col: 0/0 ORA-00942: table or view does not exist
+  --Line/Col: 0/0 ORA-54039: table must have at least one column that is not invisible
+
+select * from k_view0;
+  -- view "SQL_KJLCZGXUXLTTYFCQVLNMIEFHR.K_VIEW" has errors
+
+select * from user_objects where object_name= 'k_view0';
+
+--creating base table:::
+---------------------
+create table emp_cpy as select * from hr.employees;
+create or replace view k_view2 as select * from emp_cpy;
+
+select * from k_view2;
+select * from user_objects where object_name= 'k_view2'; --no data found
+select * from user_views where view_name= 'k_view';  --no data found
+
+select * from user_objects
+note: By using above query ,we can say that
+      -with use of force keyword we can create the view without base table and status shown as INVALID
+      -when we create view on base table , view create without error and its status will be VALID
+
+select * from emp_cpy;
+
+--use of read only options::
+===========================
+
+create or replace view k_view4 as select * from emp_cpy with read only;
+
+INSERT INTO k_view4 VALUES     
+        ( 231    
+        , 'Neena'    
+        , 'Kochhar'    
+        , 'NKOCHHAR'    
+        , '515.123.4568'    
+        , TO_DATE('21-09-2005', 'dd-MM-yyyy')    
+        , 'AD_VP'    
+        , 17000    
+        , NULL    
+        , 100    
+        , 90    
+        ); 
+  --ORA-42399: cannot perform a DML operation on a read-only view 
+
+select object_name from user_objects where object_type = 'VIEW';
+select object_name from user_objects where object_type = 'TABLE';
+
+
+
+1. How can a name be assigned to an unnamed PL/SQL Exception Block?
+   
+   declare
+    exception_name exception;
+    PRAGMA EXCEPTION_INIT(exception_name,error_code);
+   begin
+       -execution block
+   exception
+      when exception_name then
+         dbms_output.put_line('exception handled successfully');
+   end;
+
+
+        

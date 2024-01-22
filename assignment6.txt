@@ -1,0 +1,136 @@
+create or replace Procedure prc_neena_exists ( p_name in varchar2, p_result out varchar2) is 
+    v_emp hr.employees%rowtype;
+   Begin 
+   -- 1. The value which is coming through the variable p_name 
+     --  must be validated in the column first_name of emp table 
+      select * into v_emp from hr.employees where first_name=p_name;
+    --2. Name is present in the column then, 
+     /*   
+       output = 'YES' 
+       else 
+       output = 'NO' */
+       if v_emp.first_name=p_name then
+           p_result :='YES';
+       dbms_output.put_line(p_result);
+       elsif v_emp.first_name<>p_name then
+          p_result :='NO';
+          dbms_output.put_line(p_result);
+       end if;
+   End; 
+   / 
+
+declare
+   v_name varchar2(20);
+begin
+    prc_neena_exists('undar',v_name);
+end;
+
+=============================================
+create or replace Procedure prc_neena_exists ( p_name in varchar2, p_result out varchar2) is 
+    v_emp hr.employees%rowtype;
+   Begin 
+      select * into v_emp from hr.employees where first_name=p_name;
+       if v_emp.first_name=p_name then
+           p_result :='YES';
+       dbms_output.put_line(p_result);
+       elsif v_emp.first_name<>p_name then
+          p_result :='NO';
+          dbms_output.put_line(p_result);
+       end if;
+   EXCEPTION
+       WHEN no_data_found then
+        dbms_output.put_line('no');
+
+End; 
+
+
+2.
+CREATE OR REPLACE PROCEDURE PRC_RETAIN3_CHARS( P_STRING IN VARCHAR2, P_OSTRING OUT VARCHAR2 ) 
+IS 
+    v_1 varchar2(30);
+     v_2 varchar2(30);
+
+BEGIN 
+    select REVERSE(SUBSTR(P_STRING,4)),SUBSTR(P_STRING,1,3) into v_2,v_1 from dual;
+    P_OSTRING := v_1||' '||v_2;
+   dbms_output.put_line(P_OSTRING);
+END; 
+/ 
+declare
+ v_result varchar2(30);
+begin
+PRC_RETAIN3_CHARS('technologies',v_result);
+end;
+
+3.
+create or replace PROCEDURE PRc_CEIL ( P_STRING IN VARCHAR2, P_RESULT OUT VARCHAR2) IS 
+    v_num varchar2(30);
+   BEGIN 
+      --1. FIND THE DOT (.) POSITION FROM THE GIVEN INPUT P_STRING   --10.6 
+    SELECT  SUBSTR (P_STRING
+               , 1
+               , INSTR (P_STRING, '.') - 1
+               ) into v_num  from dual;
+      --2. CUT THE STRING FROM 1 ST POSITION TO THE DOT POSITION (EXCLUDE DOT) -- 10 
+      --3. ADD 1 IN THE 2 ND POINT OUTPUT  10 +1 =11, 
+          P_RESULT := TO_NUMBER(v_num,99) + 1;
+         dbms_output.put_line(P_RESULT);
+      -- THIS PROCEDURE PRINTS THE CEIL VALUE WITHOUT USING CEIL FUNCITONS 
+   END; 
+
+declare
+    v_num INTEGER;
+begin
+    PRc_CEIL('21.9',v_num);
+end;
+
+4.
+create or replace PROCEDURE PRc_FLOOR ( P_STRING IN VARCHAR2, P_RESULT OUT VARCHAR2) IS 
+    v_num varchar2(30);
+   BEGIN 
+      --1. FIND THE DOT (.) POSITION FROM THE GIVEN INPUT P_STRING   --10.6 
+    SELECT  SUBSTR (P_STRING
+               , 1
+               , INSTR (P_STRING, '.') - 1
+               ) into v_num  from dual;
+      --2. CUT THE STRING FROM 1 ST POSITION TO THE DOT POSITION (EXCLUDE DOT) -- 10 
+      --3. ADD 1 IN THE 2 ND POINT OUTPUT  10 +1 =11, 
+          P_RESULT := TO_NUMBER(v_num,99);
+         dbms_output.put_line(P_RESULT);
+      -- THIS PROCEDURE PRINTS THE CEIL VALUE WITHOUT USING CEIL FUNCITONS 
+   END; 
+
+declare
+    v_num INTEGER;
+begin
+    PRc_FLOOR('21.9',v_num);
+end;
+
+5.
+create or replace PROCEDURE PRC_ROUND ( P_STRING IN VARCHAR2, P_RESULT OUT VARCHAR2) IS 
+    v_string1 varchar2(40);
+    v_string2 varchar2(40);
+
+   BEGIN 
+     -- 1. FIND THE DOT (.) POSITION FROM THE GIVEN INPUT P_STRING   --10.6 
+     -- 2. CUT THE STRING FROM 1 ST POSITION TO THE DOT POSITION (EXCLUDE DOT) -- 10 
+      SELECT SUBSTR(P_STRING,4,INSTR(P_STRING,'.',1)-1) ,SUBSTR(P_STRING,1,INSTR(P_STRING,'.',1)-1) into v_string1,v_string2 FROM dual;
+
+      -- CHECK THE RHS( RIGHT HAND SIDE OF THE DOT ) OF THE DOT 
+         IF v_string1 >= 5 THEN 
+             P_RESULT:=v_string2 +1;
+            dbms_output.put_line(P_RESULT);
+         ELSE 
+             P_RESULT:=v_string2;
+           dbms_output.put_line(P_RESULT);
+        end if;
+       -- THIS IS THE FLOOR OUTPUT 
+      -- THIS PROCEDURE PRINTS THE ROUND VALUE WITHOUT USING ROUND FUNCITONS 
+   END ; 
+   /     
+
+       declare
+         v_num integer;
+       begin 
+           PRC_ROUND('23.6',v_num);
+       end;

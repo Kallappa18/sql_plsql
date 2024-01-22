@@ -1,0 +1,401 @@
+     Exceptions:
+	 ----------
+	 exceptiona are the run time error occurs during the execution of the sql script/programs, 
+	 two types of exception:
+	 1.Predefined exception
+	   these exceptions raised by oracle server itself
+	   login_denied
+	   invalid_cursor
+	   no_data_found
+	   too_many_rows
+	   INAVALID_NUMBER
+	   COLLECTION_IS_NULL
+	   ROW_TYPE_MISMATCH
+	   Storage_error
+	   program_error
+	   
+	 2.Non-Predefined Exception:
+	     exception can be handle by the using pragma exception_init(exception_name,error-code);
+	 3.User-Defined exception
+	   programmer or developer create manual exception by declaring exception in the declaration section
+	 
+
+Raise application error procedure:
+
+---The procedure raise_application_error allows you to issue an user-defined error from a code block or stored program.
+
+---By using this procedure, you can report errors to the callers instead of returning unhandled exceptions.
+
+    syntax:
+	
+	raise_application_error(error,message |[TRUE| FALSE]);
+    
+	In this syntax:
+
+The error_number is a negative integer with the range from -20999 to -20000.
+The message is a character string that represents the error message. Its length is up to 2048 bytes.
+If the third parameter is FALSE, the error replaces all previous errors. If it is TRUE, the error is added to the stack of previous errors.
+The raise_application_error belongs to the package DBMS_STANDARD
+
+
+1>>>
+
+declare
+  v_name varchar2(6);
+begin
+  select first_name into v_name from employees where employee_id = 50;
+  dbms_output.put_line('Hello');
+end;
+
+2>>>
+
+----------------- Handling the exception
+declare
+  v_name varchar2(6);
+begin
+  select first_name into v_name from employees where employee_id = 50;
+  dbms_output.put_line('Hello');
+exception
+  when no_data_found then
+    dbms_output.put_line('There is no employee with the selected id');
+end;
+----------------- Handling multiple exceptions
+declare
+  v_name varchar2(6);
+  v_department_name varchar2(100);
+begin
+  select first_name into v_name from employees where employee_id = 100;
+  select department_id into v_department_name from employees where first_name = v_name;
+  dbms_output.put_line('Hello '|| v_name || '. Your department id is : '|| v_department_name );
+exception
+  when no_data_found then
+    dbms_output.put_line('There is no employee with the selected id');
+  when too_many_rows then
+    dbms_output.put_line('There are more than one employees with the name '|| v_name);
+    dbms_output.put_line('Try with a different employee');
+end;
+----------------- when others then example
+declare
+  v_name varchar2(6);
+  v_department_name varchar2(100);
+begin
+  select first_name into v_name from employees where employee_id = 103;
+  select department_id into v_department_name from employees where first_name = v_name;
+  dbms_output.put_line('Hello '|| v_name || '. Your department id is : '|| v_department_name );
+exception
+  when no_data_found then
+    dbms_output.put_line('There is no employee with the selected id');
+  when too_many_rows then
+    dbms_output.put_line('There are more than one employees with the name '|| v_name);
+    dbms_output.put_line('Try with a different employee');
+  when others then
+    dbms_output.put_line('An unexpected error happened. Connect with the programmer..');
+end;
+----------------- sqlerrm & sqlcode example
+declare
+  v_name varchar2(6);
+  v_department_name varchar2(100);
+begin
+  select first_name into v_name from employees where employee_id = 103;
+  select department_id into v_department_name from employees where first_name = v_name;
+  dbms_output.put_line('Hello '|| v_name || '. Your department id is : '|| v_department_name );
+exception
+  when no_data_found then
+    dbms_output.put_line('There is no employee with the selected id');
+  when too_many_rows then
+    dbms_output.put_line('There are more than one employees with the name '|| v_name);
+    dbms_output.put_line('Try with a different employee');
+  when others then
+    dbms_output.put_line('An unexpected error happened. Connect with the programmer..');
+    dbms_output.put_line(sqlcode || ' ---> '|| sqlerrm);
+end;
+----------------- Inner block exception example
+declare
+  v_name varchar2(6);
+  v_department_name varchar2(100);
+begin
+  select first_name into v_name from employees where employee_id = 100;
+  begin
+    select department_id into v_department_name from employees where first_name = v_name;
+    exception
+      when too_many_rows then
+      v_department_name := 'Error in department_name';
+  end;
+  dbms_output.put_line('Hello '|| v_name || '. Your department id is : '|| v_department_name );
+exception
+  when no_data_found then
+    dbms_output.put_line('There is no employee with the selected id');
+  when too_many_rows then
+    dbms_output.put_line('There are more than one employees with the name '|| v_name);
+    dbms_output.put_line('Try with a different employee');
+  when others then
+    dbms_output.put_line('An unexpected error happened. Connect with the programmer..');
+    dbms_output.put_line(sqlcode || ' ---> '|| sqlerrm);
+end;
+/
+select * from employees where first_name = 'Steven';
+
+
+3>>>
+begin
+  UPDATE employees_copy set email = null where employee_id = 100;
+end;
+-----------------HANDLING a nonpredefined exception
+declare
+  cannot_update_to_null exception;
+  pragma exception_init(cannot_update_to_null,-01407);
+begin
+  UPDATE employees_copy set email = null where employee_id = 100;
+exception
+  when cannot_update_to_null then
+    dbms_output.put_line('You cannot update with a null value!');
+end;
+
+4>>>>
+/***************** The Complete PL/SQL Bootcamp ********************
+ * Author  : Oracle Master Training                                *
+ * Course  : The Complete Oracle PL/SQL Bootcamp                   *
+ * Lecture : Handling & Raising User-Defined Exceptions            *
+ *******************************************************************/
+ 
+/*************** Creating a User defined Exception *****************/
+declare
+too_high_salary exception;
+v_salary_check pls_integer;
+begin
+  select salary into v_salary_check from employees where employee_id = 100;
+  if v_salary_check > 20000 then
+    raise too_high_salary;
+  end if;
+  --we do our business if the salary is under 2000
+  dbms_output.put_line('The salary is in an acceptable range');
+exception
+  when too_high_salary then
+  dbms_output.put_line('This salary is too high. You need to decrease it.');
+end;
+/**************** Raising a Predefined Exception *******************/
+declare
+  too_high_salary exception;
+  v_salary_check pls_integer;
+begin
+  select salary into v_salary_check from employees where employee_id = 100;
+  if v_salary_check > 20000 then
+    raise invalid_number;
+  end if;
+  --we do our business if the salary is under 2000
+  dbms_output.put_line('The salary is in an acceptable range');
+exception
+  when invalid_number then
+    dbms_output.put_line('This salary is too high. You need to decrease it.');
+end;
+/****************** Raising Inside of the Exception ****************/
+declare
+  too_high_salary exception;
+  v_salary_check pls_integer;
+begin
+  select salary into v_salary_check from employees where employee_id = 100;
+  if v_salary_check > 20000 then
+    raise invalid_number;
+  end if;
+  --we do our business if the salary is under 2000
+  dbms_output.put_line('The salary is in an acceptable range');
+exception
+  when invalid_number then
+    dbms_output.put_line('This salary is too high. You need to decrease it.');
+ raise;
+end;
+
+5>>>>>
+------------------*************************************---------------------------
+RAISE_APPLICATION_ERROR procedures:
+================================================= 
+
+declare
+too_high_salary exception;
+v_salary_check pls_integer;
+begin
+  select salary into v_salary_check from employees where employee_id = 100;
+  if v_salary_check > 20000 then
+    --raise too_high_salary;
+ raise_application_error(-20243,'The salary of the selected employee is too high!');
+  end if;
+  --we do our business if the salary is under 2000
+  dbms_output.put_line('The salary is in an acceptable range');
+exception
+  when too_high_salary then
+  dbms_output.put_line('This salary is too high. You need to decrease it.');
+end;
+----------------- raise inside of the exception section
+declare
+too_high_salary exception;
+v_salary_check pls_integer;
+begin
+  select salary into v_salary_check from employees where employee_id = 100;
+  if v_salary_check > 20000 then
+    raise too_high_salary;
+  end if;
+  --we do our business if the salary is under 2000
+  dbms_output.put_line('The salary is in an acceptable range');
+exception
+  when too_high_salary then
+  dbms_output.put_line('This salary is too high. You need to decrease it.');
+  raise_application_error(-01403,'The salary of the selected employee is too high!',true);
+end;
+
+
+
+EXCEPTIONS:
+--------
+-errors are represented as exception in oracle, while executing the script
+-unhandled exception terminate the execution
+-exception can be handled at the cleint side also
+
+types of exceptions:
+------------------
+1.Pre-defined exception:
+   -these are having corresponding textual name from oracle 
+
+2.Non-predefined exception
+   -these are not having any corresponding textual name from oracle 
+   -these are have only unique code.
+
+3.User defined exception
+  -These are custom error , created by the programmer
+
+
+
+
+declare
+  v_l_name varchar2(200);
+begin
+  select last_name into v_l_name from hr.employees where employee_id=99;
+  dbms_output.put_line('last name of the specified employee:'||v_l_name);
+end;
+
+error:
+no data found ORA-06512
+
+
+declare
+  v_l_name varchar2(200);
+begin
+  select last_name into v_l_name from hr.employees where employee_id=99;
+  dbms_output.put_line('last name of the specified employee:'||v_l_name);
+exception
+    when no_data_found then
+     dbms_output.put_line('no employee present with that employee_id');  
+end;
+
+
+
+declare
+  v_l_name varchar2(200);
+  v_emp_id number;
+begin
+  --select last_name into v_l_name from hr.employees where employee_id=99;   --100,99,grant
+  --select employee_id into v_emp_id from hr.employees where last_name='Grant';
+    select employee_id into v_emp_id from hr.employees where last_name=12;
+    dbms_output.put_line('last name of the specified employee:'||v_l_name);
+    dbms_output.put_line('specified employee id:'||v_emp_id);
+exception
+    when no_data_found then
+     dbms_output.put_line('no employee present with that employee_id'); 
+     dbms_output.put_line('errcode:'||sqlcode||' error message: '||sqlerrm);
+    when too_many_rows then
+     dbms_output.put_line('too many rows identified'); 
+     dbms_output.put_line('errcode:'||sqlcode||' error message: '||sqlerrm);
+    when others then
+     dbms_output.put_line('what is this error, what happening to my code'); 
+     dbms_output.put_line('errcode:'||sqlcode||' error message: '||sqlerrm);
+end;
+
+
+RAISE EXCEPTIONS TO CALLING
+=============================
+create or replace PROCEDURE get_emp_id(p_last_name IN VARCHAR2,p_employee_id OUT NUMBER)
+IS
+begin
+    select employee_id into p_employee_id from hr.employees where last_name=p_last_name;
+    dbms_output.put_line('specified employee id:'||p_employee_id);
+exception
+    when no_data_found then
+     dbms_output.put_line('no employee present with that employee_id'); 
+     dbms_output.put_line('errcode:'||sqlcode||' error message: '||sqlerrm);
+     raise;
+    when too_many_rows then
+     dbms_output.put_line('too many rows identified'); 
+     raise;
+    when others then
+     dbms_output.put_line('what is this error, what happening to my code'); 
+     dbms_output.put_line('errcode:'||sqlcode||' error message: '||sqlerrm);
+     raise;
+end;
+
+declare
+   v_id   number;
+begin
+      get_emp_id('Grant',v_id);
+exception
+     when too_many_rows then
+     dbms_output.put_line('too many rows employee id identified for one surname'); 
+     dbms_output.put_line('errcode:'||sqlcode||' error message: '||sqlerrm);
+end;
+
+
+
+non-predefined exceptions:
+-------------------------
+create table employees as select * from hr.employees;
+
+create or replace procedure create_table(table_name varchar2)
+is
+begin
+   execute immediate 'create table ' ||table_name || '( n number)';
+end;
+
+begin
+  create_table('employees');
+end;
+
+error:
+ORA-00955: name is already used by an existing object
+sqlcode: -955
+
+create or replace procedure create_table(table_name varchar2)
+is
+    table_exists exception;
+    pragma exception_init(table_exists,-955);
+begin
+   execute immediate 'create table ' ||table_name || '( n number)';
+
+exception
+    when table_exists then
+    dbms_output.put_line('name is already used by an existing object');
+end;
+
+begin
+  create_table('employees');
+end;
+
+
+
+USER DEFINED EXCEPTIONS::
+========================
+create or replace procedure insert_job(job_id varchar2,job_title varchar2,min_salary number,max_salary number)
+is
+begin
+    if min_salary>max_salary then
+      raise_application_error(-20101,'min_salary>max_salary');
+    end if;
+    insert into jobs values(job_id,job_title,min_salary,max_salary);   
+end;
+
+declare
+    invalid_salary_boundariese exception;
+    pragma exception_init(invalid_salary_boundariese,-20101);
+begin
+   insert_job('AD_GkJ','middleware admin',20002,10070);
+exception
+    when invalid_salary_boundariese then
+        dbms_output.put_line('The salary need to be corrected...!!!');
+end;

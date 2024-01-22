@@ -1,0 +1,170 @@
+Hi Team, Please topics for today
+
+ 
+
+****************************Procedure********************************
+1.  it is DB object ,
+2.  it will stored inside the database
+3.  it accepts parameters ( In / Out / In out )
+4.  We cannot assign values to in parameters inside of the procedure
+5.  If we are not mentioing " in" at the parameter ,
+        it will consider as input parameteR
+6.  procedure can be invoke (call) from anonymous block/ procedure /function
+7.  one procedure can be called from multiple session at the same time
+8.  PROCEDURE MAY OR MAY NOT RETURN VALUE - means , proceure may or may not have output parameters
+9.  PROCEDURE PERFORMS ACTION
+10. PROCEDURE IS USED TO CREATE NEW TRANSACTIONS, DELETE/MODIFY EXISTING TRANSACTIONS
+11. Default parameter can be added in procedures, if we give any value while calling it will take the
+     given value for execution
+
+ 
+
+     if we not provided value for default parameter, it will execute the procedure with default value
+has context menu
+
+ 
+
+******************Interview********************
+1.     What is anonymus block? and what is use of anonymous block?
+2.     Structure of anonymus block?
+        DECLARE
+		BEGIN
+		EXCEPTION
+		END
+		
+3.     What is cursor ? and type of cursors?
+       -Cursors are pointers, which holds the sql satatement executed data temporarly.
+	   -Types:
+	    IMPLICIT Cursor
+		EXPLICIT Cursor
+4.     diff between implicit and explicit cursor
+5.     what are cursor attributes:
+          ISOPEN : This cursor attribute checks , whether cursor is open or not
+		       -Always returns FALSE for implicit cursors, 
+			    because Oracle closes the SQL cursor automatically after executing its associated SQL statement.
+		  FOUND  :
+		   -It returns true
+		         -whenever any update delete insert statment affected one or more rows, or
+				 -Whenever the Select INTO statement returns rows
+		   -else it returns false
+				 
+		  NOTFOUND   :
+		   -It returns true
+		         -whenever any update delete insert statment affected no rows, or
+				 -Whenever the Select INTO statement returns no rows
+		   -else it returns false
+		  ROWCOUNT
+		  We use sql%attribute_name to access all above cursor attributes
+		  
+6.     how to find a DML statement is affecting any records inside the procedure?
+       -By calling the procedure
+	   -and checking the rows of the table.
+7.     what is procedure ?
+       -Procedures are the stored database objects, once procedure executed we can call mutilple times whenever needed
+	   -procedure has no return value, instead OUT parameter is used to get the value from procedure
+8.     can we assign values to input parameter of the procedure ?
+9.     what is default parameter
+          -default parameter executed when the parameters are not mentioned explicitly
+10.    what is in out parameter?
+11.    can I call a procedure from another procedure ?
+******************************Types of Cursor************************************
+
+      cursors are the pointers which has temparory memory pointing to the sql query results set
+
+1.Implicit Cursor
+         -select statement 
+		   insert ,update,delete
+2.Explicit Cursor
+          -we have to create the own cursor manually, and use it wheever we needed it
+		  open()
+		  fetch
+		  close()
+		  
+		  
+ 
+
+*****************************Cursor Attributes**********************************
+
+ 
+
+ISOPEN  -- it returns true when the cursor is in opened state
+FOUND   -- it shows the cursor having records inside
+NOTFOUND  -- it shows the cursor doesnot having records inside
+ROWCOUNT  -- it shows number of records available inside the cursor
+
+ 
+
+****************************Function*******************************************
+
+ 
+
+1. function is a DB object
+   yes
+2. function must return value
+    yes
+3. function will return a value by default
+4. function can return multiple values by using of out parameters
+5. functions can be called from select clause / sql statements
+6. function performs calculations / validation
+7. function can be return multiple records,if the function having return type of sys_refcursor/nested tables
+
+ 
+
+8. When we cannot call the functions through the select clause
+    1. if the function having out/ inout parameters
+    2. if the function retunrs sql un supported data types
+          varray,refcursor
+    3. if the function having DML inside without the pragma autonomous_transaction
+
+ 
+
+***********************Interview************************
+
+ 
+
+What is functions?
+ 
+when to create functions ?
+      Functions can be created , whenever we want to use same code again and again
+	  -reusablilty
+	  -Functions can return values
+Diff between functions and procedure ?
+
+        functions                                                             procedures
+		
+1.A function has return type and return value                           A procedure does not have return value, but it returns using OUT parameter
+2.We cannot use a function with Data Manipulation queries.             We can use DML queries such as insert,update,delete,select...
+    Only Select queries are allowed in functions.
+3.A function does not allow output parameter                             Procedures allows both IN AND OUT parameters
+
+4.We cannot manage transactions inside a function.                      We can manage transactions inside a function.
+
+5.We cannot call stored procedures from a function                      We can call functions from the procedures 
+
+6.We can call function using select statement                           We can not call procedure using select statement
+
+
+can function have out parameter?
+            no
+can function return multiple values or not?
+                  no
+can function contains DML ?
+   -You cannot use a function with Data Manipulation queries. Only Select queries are allowed in functions.
+  -You can use DML inside a PL/SQL function. However, the function can only be called from PL/SQL, not from SQL.
+  
+when we cannot call the functions from select clause
+-A function can be called from a select statement as long as it does not alter data.
+How you determine the program has to be created as function/ procedure ?
+   -when we want to return only one value, then we have to use function
+   -When we want to return more then one value, we will go for procedures
+
+
+note:
+Technically, calling a stored procedure from a function is possible. 
+But remember the purpose of the stored procedure and functions.
+
+Purpose of function: The function is used to compute a value and hence must return a value.
+ A function can be called from a select statement as long as it does not alter data. (Permanent table data, not temp tables)
+
+Purpose of Stored procedure: The stored procedure is used to execute business 
+logic and hence may or may not return a value.

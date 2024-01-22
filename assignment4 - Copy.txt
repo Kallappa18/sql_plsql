@@ -1,0 +1,271 @@
+[10:59 AM] Amuthan Baskar
+
+Hi Team, Todays Topic
+
+INDEX
+   -Index is a database objects that makes data retrieval faster
+   -index will speed up the searching of the data from the database tables
+   -It is also retrieve the vast amount of data from the table frequently
+   -Index require its own hard disk 
+   
+  syntax:
+       create index index_name on table_name(column_name);
+	   
+	   when we want to create index on multiple tables:
+	   -----------------------------------------------
+       create index index_name on table_name(column_name1,column2,column3...); 
+  
+  
+Types of Index
+
+B tree Index :
+  Binary tree index,this index helps with sorting data from the table ,used to search the data faster whenever the data is vast'
+  
+Unique Index :
+     -unique index are indexes helps to maintain data integrity , by insuring the no rows in the table contains the duplicate values
+non Unique Index
+     -non-unique: it allows the multiple of same value in the column
+Composite  :
+     -used to apply the index for more than one column.
+BitMap Index :
+     -used whenever the column contains less distinct values
+	 syntax:
+	   create BITMAP demo_index on table_name(column_name);
+Functional Index
+
+ 
+
+Ques and Topics related to index 
+
+
+
+1.index? 
+      Indexes are the database objects , which are help to maintain the data integrity ,
+	  by insuring the no two rows in the table contain duplicate values
+	  -Indexes speed up the data searching ability in the table 
+	  
+2. type of indexes ?
+      -unique and non-unique index
+	  -b tree index
+	  -BitMap Index
+	  -functionl index
+	  -composite index
+	  
+        
+3. When to create index 
+
+      if the table having huge volume of records and the
+
+      column is used frequently in where clause that column requires index 
+
+4. what is bit map index :
+      -bitmap indexing is the technique, which enable data to retrieved quickly from the columns that are frequently used and 
+	  have a low cardinality
+	    cardinality: count of distinct element in the column
+      -if count of the distinct element is less, then we call it as low cardinality
+	  syntax:
+	     create bitmap 
+5. diff between unique and non unique index 
+          unique: it allows only one value once in the column
+		  non-unique: it allows the multiple of same value in the column
+6. how to list all available index from a table 
+         -select * from user_indexes;
+7. how to identify a column having index or not ?
+    -- select * from USER_IND_COLUMNS where TABLE_NAME ='EMP_CPY';
+    -- select * from USER_IND_COLUMNS where TABLE_NAME = UPPER('emp_cpy'); 
+
+8. how to identify the qry is using index or not > 
+
+9. if the qry goes to full table scan , what we have to do ? 
+
+      - we have to check the where clause column having index or not 
+
+      -if index is not there then, create a new index for the column 
+
+      - if the index is there and it is not used by the qry then 
+
+      - check the index status and do the index  rebuild     
+
+10. how to rebuild the index 
+
+11. when to rebuild the index 
+
+      - if the index is there and it is not used by the qry then 
+
+      - check the index status and do the index  rebuild     
+
+12. if i use nvl in where clause ,  index will work or not ? 
+
+13. how to drop the index 
+
+     drop index idx0001;
+
+14.  can i create index for all table columns 
+
+  no , index has to be create the frequently used columns in where clause 
+
+15. maximum number of available column in composite index? 
+     -16 columns
+	 -All the columns in a composite index key must be in the same table
+16. we cannot create composite index for 2 varchar2(4000) length columns.
+
+17.can we create index on foriegn column
+
+ 
+
+Interview Qns Mview: 
+
+ 1. What is mview? 
+   -it is a materialized view is a database object it contains the results of the query 
+   -Data is physically stored in the database 
+
+    syntax:
+   Create materialized view View_Name
+
+   Build [Immediate/Deffered]
+
+   Refresh [Fast/Complete/Force]
+
+   on [Commit/Demand]
+
+   as Select ..........;
+   
+	1.Build Immediate: Means materialized views(mv) created immediately.
+
+	2.Build Deferred: Means materialized views(mv) created after one refresh.
+
+	3.Refresh on commit:
+
+	This option committed the data in materialized views in SQL immediately after data inserted and committed in table. This option is known as incremental refresh option. 
+	View is not fully refreshed with this option
+
+	4.Refresh on Demand:
+
+	Using this option you can add the condition for refreshing data in materialized views.   
+
+ 2. when to create m view ? 
+    -when we want the faster response,when we need a partial refresh
+	-m view store the data in the database, 
+
+ 3. what are refresh methods? 
+
+ 4. diff between immediate and differed 
+   Build Immediate: Means materialized views(mv) created immediately.
+
+	Build Deferred: Means materialized views(mv) created after one refresh.
+
+ 5. what is mview logs ? 
+
+ 6. diff between fast/ force / complete 
+ 
+        fast refresh/incremental refresh:
+		--When in database level some DML changes are done then Oracle 
+		Database stores rows describing those changes in the materialized view log and then uses the materialized view log to refresh materialized views based on the master table.
+		This process is called incremental or fast refresh. 
+          --it takes less time compare to complete refresh
+		complete refresh;
+		 Without a materialized views log, Oracle Database must re-execute the materialized view query to refresh the materialized views. 
+		 This process is called a complete refresh. 
+		 --it takes more time compare to fast refresh
+ 7. list out fast refresh restrictions ? 
+
+        if mview has deferred build clause then, fast refresh not possible 
+
+        if the mview not contain primary key column in select clause qry then, fast refresh not possible 
+
+        if the mview qry has group by , fast refresh will not work 
+
+ 8. diff between on commit / on demand 
+        on commit: this option will committed the data in the mview after the data inserted and commited in the table 
+		          -it is a incremental refresh option, view doest not referesh completly
+
+        on demamd: This option is used to add condition to refresh the data in the mview
+ 9. query rewrite ? 
+     -When base tables contain large amount of data, it is expensive and time-consuming to compute
+	 the required aggregates or to compute joins between these tables.
+	 In such cases, queries can take minutes or even hours. 
+	 Because materialized views contain already precomputed aggregates and joins, 
+     -becs mview already oracle database brought powerful process called QUERY REWRITE, to quickly answer the query using materialized views.
+ 10. diff between view / mview 
+                https://www.stechies.com/difference-between-view-materialized-view/        
+
+ 11. can we create index on mviews ?
+       yes
+
+ 12. is mview will occupy the storage ? 
+     -yes
+
+  13. how to refresh mviews ?
+
+ 
+
+Interview qs for View!
+
+1.what is view 
+  -view is a virtual table that does not exist physically,It is stored in the data dictionary and do no store any data
+  -It can be executed when called
+2. what are type of views ? 
+       simple view
+	   :simple view contains only single base table
+	   complex view
+	   :complex view can be constructed on multiple base table
+	    -we can use joins,group by order by clause
+3. what is use of views ? 
+    -Views are used as security purpose because they provide the encapsulation to the name of the table
+	-Data is stored in the virtual table, not permanently ans views can display only selected data
+	
+4. can we do dml in views ? 
+     - view is stored as a SELECT statement in the database. DML operations on a view like INSERT, UPDATE, DELETE 
+	 affects the data in the original table upon which the view is based. 
+     -DML operations on views can be performed as long as the view does not contain these words: 
+	   DISTINCT, GROUP BY, START WITH, CONNECT BY, ROWNUM,
+	     complex view contains group by clause, so we cant do the dml in complex view
+		 
+5. how to restrict dml in simple view? 
+    --We can restrict the dml op in view with 'WITH READ ONLY' option
+	--This clause indictates that view created with read only, no write op allowed , if we try to do any DML op , oracle raise an error
+
+6. can we create view for non existing tables ? 
+    yes
+	:if a view refers to a non-existent table or an invalid column of an existing table or 
+	if the owner of the view does not have the required privileges, 
+	then the view can still be created and entered into the data dictionary.
+
+7. if we add any new column in the base table  after creation of the view, 
+
+   that new column will be added in the view or not? 
+
+8. diff between drop & create view and create or replace view 
+
+drop view:  DROP VIEW statement is used to remove or delete view completely
+create view: CREATE VIEW statment is used to create the oracle view
+create or replace: CREATE OR REPLACE statement is used to modify the definition of oracle view without dropping it
+
+9. what is with check option? 
+    -check constraints used to provide condtion in the sql statement
+
+10. can we create index on the views ?
+   -yes
+   -first index created on view must be unique clustered index
+   -once unique clustered index created, we can create the multiple non clusted index
+
+ 
+
+What is Procedure ?
+   -Procedures are stored procedure, which is used for reusability
+   -we can run the procedure as many time as possible
+   -execute once and used it again and again
+   -no return type used in the procedures
+   
+What is Function?
+   --used for the reusablity and have a return type
+ functions:
+ -dml statements can not be executed in functions
+ -if we use dml statemenrts in functions, we can not use those functions in select statements
+ -if we want to use use dml and call that function in select statements , then we have to make the transction as autonomous transaction
+   
+What is Anonymous Block ?
+     -a block of code , which has a no name
+	 -anonymous block does not stored in the database,once it executes data will be lost
+	 
+
