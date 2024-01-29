@@ -1289,3 +1289,386 @@ end;
        exec proc_consultant(105, 8, 'Z');
 
 
+=============================================================================================
+cursors:
+https://github.com/JieunKwon/PL_SQL_Cursor
+https://github.com/porpup/PL-SQL_CURSOR_LOOPs
+
+https://github.com/porpup/PL-SQL_CURSOR_FOR_LOOP
+
+https://github.com/porpup/PL-SQL_CURSOR_with_parameters
+
+
+
+ select * from term;
+
+
+1.Using cursor to display many rows of data, create a procedure to display the all the rows of table term.
+
+create or replace procedure get_term_data
+as
+cursor term_c is select * from term;
+r_term term%rowtype;
+begin
+      if term_c%ISOPEN then
+           dbms_output.put_line('cursor is not opned!!..');
+      end if;
+      open term_c;
+      loop
+        fetch term_c into r_term;
+        dbms_output.put_line(r_term.term_id||' '||r_term.term_desc||' '||r_term.status);
+        exit when term_c%notfound;
+      end loop;
+      close term_c;
+end;
+
+exec get_term_data;
+
+-------by use of custom record---------
+create or replace procedure get_term_data
+as
+cursor term_c is select term_desc,status from term;
+type r_custom_term is record(p_term_desc term.term_desc%type,
+                      p_status term.status%type);
+r_c_term r_custom_term;
+begin
+      open term_c;
+      loop
+        fetch term_c into r_c_term;
+        dbms_output.put_line(r_c_term.p_term_desc||' '||r_c_term.p_status);
+        exit when term_c%notfound;
+      end loop;
+      close term_c;
+end;
+
+exec get_term_data;
+
+-----------use of cursor for loop  -----
+
+create or replace procedure get_term_data
+as
+cursor term_c is select term_desc,status from term;
+begin
+       for k in term_c
+       loop
+           dbms_output.put_line(k.term_desc);
+       end loop;
+end;
+
+exec get_term_data;
+
+============================
+2.Using cursor to display many rows of data, create a procedure to display the following data from the database: Item description, price, color, and quantity on hand.
+
+
+create or replace procedure get_item_inv_data
+as
+cursor item_c is select item_desc,color,inv_price,inv_qoh from item join inventory using(item_id);
+r_item item_c%rowtype;
+--type r_custom_term is record(p_term_desc term.term_desc%type,
+--                    p_status term.status%type);
+--r_c_term r_custom_term;
+begin
+      open item_c;
+      loop
+        fetch item_c into r_item;
+        dbms_output.put_line('item desc: '||r_item.ITEM_DESC||', color:'||r_item.COLOR||', inv price: '||r_item.INV_PRICE||', quality on hand : '||r_item.INV_QOH);
+        exit when item_c%notfound;
+      end loop;
+      close item_c;
+end;
+
+
+exec get_item_inv_data;
+-------
+create or replace procedure get_item_inv_data
+as
+cursor item_c is select item_desc,color,inv_price,inv_qoh from item join inventory using(item_id);
+type r_custom_item is record(p_item_desc item.item_desc%type,
+                            p_color inventory.color%type,
+                             p_inv_price inventory.INV_PRICE%type,
+                              p_INV_QOH   inventory.INV_QOH%type);
+ r_item r_custom_item;
+begin
+      open item_c;
+      loop
+        fetch item_c into r_item;
+        dbms_output.put_line('item desc: '||r_item.p_item_desc||', color:'||r_item.p_color||', inv price: '||r_item.p_inv_price||', quality on hand : '||r_item.p_INV_QOH);
+        exit when item_c%notfound;
+      end loop;
+      close item_c;
+end;
+
+exec get_item_inv_data;
+
+===========================
+3.Using cursor to update many rows of data, create a procedure that accepts a number represent the percentage increase in price.
+The procedure will display the old price, new price and update the database with the new price.
+
+
+create or replace procedure price_increment(p_inc_perc number)
+as
+cursor inv_c is select * from inventory;
+r_inv inventory%rowtype;
+new_inc_price number;
+begin
+      open inv_c;
+      loop
+        fetch inv_c into r_inv;
+         new_inc_price:=r_inv.INV_PRICE*p_inc_perc;
+         dbms_output.put_line('old inv price: '||r_inv.INV_PRICE||', increased inv price : '||new_inc_price);
+         update inventory set inv_price=new_inc_price where inv_id=r_inv.inv_id;
+        exit when inv_c%notfound;
+      end loop;
+      close inv_c;
+      commit;
+end;
+
+select * from inventory;
+exec price_increment(1.5);
+
+================
+select comm from emp;
+Question 4 :
+Run script scott_emp_dept.
+Create a procedure that accepts a number represent the number of employees who earns the highest salary.
+Display employee name and his/her salary
+Ex:
+        SQL> exec L5Q4(2)
+        SQL> top 2 employees are
+        KING 5000
+        FORD 3000
+
+
+
+
+create or replace procedure get_sal(p_emp_no in number) 
+as
+  cursor emp_cur is select sal,ename from emp order by sal desc;
+  --r_emp emp_cur%rowtype;
+   lv_sal emp.sal%type;
+   lv_ename emp.ename%type;
+begin  
+   open emp_cur;
+   for k in 1..p_emp_no
+   loop
+       --fetch emp_cur into r_emp;
+       fetch emp_cur into lv_sal,lv_ename;
+       dbms_output.put_line(lv_sal||' '||lv_ename);
+       exit when emp_cur%notfound;
+   end loop;
+   close emp_cur;    
+end;
+
+exec get_sal(2);
+
+======================================
+
+/* Question 5:
+Modify question 4 to display ALL employees who make the top salary entered 
+Ex: SQL> exec L5Q5(2) 
+SQL> Employee who make the top 2 salary are
+KING 5000
+FORD 3000
+SCOTT 3000 */
+
+
+create or replace procedure get_sal(p_emp_no in number) 
+as
+  cursor emp_cur is
+            with x as (select distinct desc_order.sal from (select sal from emp order by sal desc) desc_order where rownum <=p_emp_no)
+             select sal, ename from emp where sal in (select sal from x) order by sal desc;
+   lv_sal emp.sal%type;
+   lv_ename emp.ename%type;
+begin  
+   open emp_cur;
+   for k in 1..p_emp_no
+   loop
+       --fetch emp_cur into r_emp;
+       fetch emp_cur into lv_sal,lv_ename;
+       dbms_output.put_line(lv_sal||' '||lv_ename);
+       exit when emp_cur%notfound;
+   end loop;
+   close emp_cur;    
+end;
+
+exec get_sal(2);
+
+******************************https://github.com/porpup/PL-SQL_CURSOR_FOR_LOOP********************************************
+
+Question 1:
+Run script 7northwoods in schemas des03
+Using CURSOR FOR LOOP syntax 1 in a procedure to display all the faculty member
+(f_id, f_last, f_first, f_rank),
+under each faculty member, display all the student advised by that faculty member
+(s_id, s_last, s_first, birthdate, s_class).
+
+
+create or replace procedure get_faculty_details
+as
+cursor faculty_c is  
+           select f_id, f_last, f_first, f_rank from faculty;
+cursor student_c(c_f_id number) is
+           select s_id, s_last, s_first, s_dob, s_class from student where f_id=c_f_id;
+begin
+     for faculty in faculty_c
+      loop       
+       dbms_output.put_line('-----------------------------------------------');
+       dbms_output.put_line('f_id::::'||faculty.f_id||',  '||faculty.f_last||' '||faculty.f_first||' '||faculty.f_rank);
+          for student in student_c(faculty.f_id) 
+                  loop
+                  dbms_output.put_line('**********************************************');
+                  dbms_output.put_line('s_id::::'||student.s_id||',  '||student.s_last||chr(10)||student.s_dob||chr(10)||student.s_class);
+                  end loop;
+      end loop;
+end;
+
+exec  get_faculty_details;
+
+
+
+CREATE OR REPLACE PROCEDURE L7Q1 AS
+CURSOR f_member_cur IS
+    SELECT
+        F_ID,
+        F_LAST,
+        F_FIRST,
+        F_RANK
+    FROM
+        FACULTY;
+
+CURSOR student_cur(p_f_id NUMBER) IS
+    SELECT
+        S_ID,
+        S_LAST,
+        S_FIRST,
+        S_DOB,
+        S_CLASS
+    FROM
+        STUDENT
+    WHERE
+        F_ID = p_f_id;
+
+BEGIN
+    FOR m IN f_member_cur LOOP
+        DBMS_OUTPUT.PUT_LINE('----------------------------------------');
+        DBMS_OUTPUT.PUT_LINE('Faculty member: ' || m.F_ID || '. ' || m.F_LAST ||
+                            ' ' || m.F_FIRST || ', ' || m.F_RANK);
+    
+        FOR s IN student_cur(m.F_ID) LOOP
+            DBMS_OUTPUT.PUT_LINE('******************************');
+            DBMS_OUTPUT.PUT_LINE('Student: ' || s.S_ID || '. ' || s.S_LAST ||
+                                ' ' || s.S_FIRST || chr(10) ||
+                                'Born: ' || s.S_DOB || chr(10) ||
+                                'Class: ' || s.S_CLASS);
+        END LOOP;
+    
+    END LOOP;
+END;
+
+exec L7Q1;
+
+create or replace procedure get_faculty_details
+as
+cursor faculty_c is  
+           select f_id, f_last, f_first, f_rank from faculty;
+cursor student_c(c_f_id number) is
+           select s_id, s_last, s_first, s_dob, s_class from student where f_id=c_f_id;
+begin
+     for faculty in faculty_c
+      loop       
+       dbms_output.put_line('-----------------------------------------------');
+       dbms_output.put_line('f_id::::'||faculty.f_id||',  '||faculty.f_last||' '||faculty.f_first||' '||faculty.f_rank);
+          for student in student_c(faculty.f_id) 
+                  loop
+                  dbms_output.put_line('**********************************************');
+                  dbms_output.put_line('s_id::::'||student.s_id||',  '||student.s_last||chr(10)||student.s_dob||chr(10)||student.s_class);
+                  end loop;
+      end loop;
+end;
+
+exec  get_faculty_details;
+
+
+
+CREATE OR REPLACE PROCEDURE L7Q1 AS
+CURSOR f_member_cur IS
+    SELECT
+        F_ID,
+        F_LAST,
+        F_FIRST,
+        F_RANK
+    FROM
+        FACULTY;
+
+CURSOR student_cur(p_f_id NUMBER) IS
+    SELECT
+        S_ID,
+        S_LAST,
+        S_FIRST,
+        S_DOB,
+        S_CLASS
+    FROM
+        STUDENT
+    WHERE
+        F_ID = p_f_id;
+
+BEGIN
+    FOR m IN f_member_cur LOOP
+        DBMS_OUTPUT.PUT_LINE('----------------------------------------');
+        DBMS_OUTPUT.PUT_LINE('Faculty member: ' || m.F_ID || '. ' || m.F_LAST ||
+                            ' ' || m.F_FIRST || ', ' || m.F_RANK);
+    
+        FOR s IN student_cur(m.F_ID) LOOP
+            DBMS_OUTPUT.PUT_LINE('******************************');
+            DBMS_OUTPUT.PUT_LINE('Student: ' || s.S_ID || '. ' || s.S_LAST ||
+                                ' ' || s.S_FIRST || chr(10) ||
+                                'Born: ' || s.S_DOB || chr(10) ||
+                                'Class: ' || s.S_CLASS);
+        END LOOP;
+    
+    END LOOP;
+END;
+
+exec L7Q1;
+
+========
+/* Question 2:
+Run script 7Software in schemas des04
+Using %ROWTYPE in a procedure, display all the consultants. 
+Under each consultant display all his/her skill (skill description) and the 
+status of the skill (certified or not) */
+
+create or replace procedure get_consultant_skill_details
+as
+cursor c_consultant is select c_id,c_last from consultant;
+v_cons c_consultant%rowtype;
+cursor c_consu_skill(c_c_id number) is select cs.skill_id,skill_description,certification from consultant_skill cs join skill s on cs.skill_id=s.skill_id where c_id=c_c_id;
+
+v_cons_skill c_consu_skill%rowtype;
+begin
+    open c_consultant;
+    fetch c_consultant into v_cons;
+    while c_consultant%found 
+        loop 
+            dbms_output.put_line('------------------------------------');
+            dbms_output.put_line('c_id::'||v_cons.c_id||chr(32)||v_cons.c_last);
+               open c_consu_skill(v_cons.c_id);
+               fetch c_consu_skill into v_cons_skill;
+                while c_consu_skill%found 
+                  loop
+                     dbms_output.put_line('******************************************');
+                     dbms_output.put_line('skill id ::'||v_cons_skill.skill_description||chr(32)||v_cons_skill.certification);   
+                     fetch c_consu_skill into v_cons_skill;
+                   end loop;
+                   close c_consu_skill;
+         fetch c_consultant into v_cons;
+        end loop;
+        close c_consultant;
+end;
+
+
+exec get_consultant_skill_details;
+
+
+
